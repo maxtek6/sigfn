@@ -65,7 +65,6 @@ int test_main(const char *test_name)
 
     if (offset != -1)
     {
-        puts((unit_tests + offset)->name);
         result = (unit_tests + offset)->func();
     }
 
@@ -74,58 +73,64 @@ int test_main(const char *test_name)
 
 int test_handle()
 {
-    /*
-        puts("handle");
-        int result;
-        int expected;
-        int actual;
-        int raised;
+    int result;
+    int expected;
+    int actual;
+    int raised;
 
-        result = PASS;
+    result = PASS;
 
-        puts("1");
-        expected = SIGFN_INVALID_SIGNUM;
-        actual = sigfn_handle(INVALID_SIGNUM, echo_signum, NULL);
+    expected = SIGFN_INVALID_SIGNUM;
+    actual = sigfn_handle(INVALID_SIGNUM, echo_signum, NULL);
+    result = (expected == actual) ? PASS : FAIL;
+
+    if (result == PASS)
+    {
+        expected = SIGFN_INVALID_HANDLER;
+        actual = sigfn_handle(SIGINT, INVALID_HANDLER, NULL);
         result = (expected == actual) ? PASS : FAIL;
+    }
 
-        if (result == PASS)
-        {
-            puts("1");
-            expected = SIGFN_INVALID_HANDLER;
-            actual = sigfn_handle(SIGINT, INVALID_HANDLER, NULL);
-            result = (expected == actual) ? PASS : FAIL;
-        }
+    if (result == PASS)
+    {
+        expected = SIGFN_SUCCESS;
+        actual = sigfn_handle(SIGINT, echo_signum, &raised);
+        result = (expected == actual) ? PASS : FAIL;
+    }
 
-        if (result == PASS)
-        {
-            puts("1");
-            expected = SIGFN_SUCCESS;
-            actual = sigfn_handle(SIGINT, echo_signum, &raised);
-            result = (expected == actual) ? PASS : FAIL;
-        }
+    if (result == PASS)
+    {
+        expected = SIGINT;
+        raise(SIGINT);
+        actual = raised;
+        result = (expected == actual) ? PASS : FAIL;
+    }
 
-        if(result == PASS)
-        {
-            puts("1");
-            expected = SIGINT;
-            raise(SIGINT);
-            actual = raised;
-            result = (expected == actual) ? PASS : FAIL;
-        }
-
-        return result;
-    */
-    return 0;
+    return result;
 }
 
 int test_ignore()
 {
-    puts("ignore");
-    return 0;
+    int result;
+    int expected;
+    int actual;
+
+    expected = SIGFN_INVALID_SIGNUM;
+    actual = sigfn_ignore(INVALID_SIGNUM);
+    result = (expected == actual) ? PASS : FAIL;
+
+    if (result == PASS)
+    {
+        expected = SIGFN_SUCCESS;
+        actual = sigfn_ignore(SIGINT);
+        result = (expected == actual) ? PASS : FAIL;
+    }
+
+    return result;
 }
 
 int test_reset()
 {
-    puts("reset");
-    return 1;
+    
+    return 0;
 }

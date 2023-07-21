@@ -1,6 +1,11 @@
 #include "sigfn.h"
 
+#include <stdlib.h>
 #include <signal.h>
+
+#ifdef _WIN32
+    typedef void (*__sighandler_t)(int);
+#endif
 
 const int SIGFN_SIGNUMS[] = {
     SIGABRT,
@@ -24,7 +29,7 @@ static struct sigfn_mapping sifgn_mappings[SIGFN_SIGNUM_COUNT];
 
 static void sigfn_handler(int signum);
 
-static int sigfn_signal(int signum, _crt_signal_t handler);
+static int sigfn_signal(int signum, __sighandler_t handler);
 
 int sigfn_handle(int signum, sigfn_handler_func handler, void *userdata)
 {
@@ -68,7 +73,7 @@ void sigfn_handler(int signum)
 
     for (mapping_index = 0; mapping_index < SIGFN_SIGNUM_COUNT; mapping_index++)
     {
-        if (mapping != NULL && sifgn_mappings[mapping_index].signum == signum)
+        if (mapping == NULL && sifgn_mappings[mapping_index].signum == signum)
         {
             mapping = &sifgn_mappings[mapping_index];
         }
@@ -77,7 +82,7 @@ void sigfn_handler(int signum)
     mapping->handler_func(mapping->signum, mapping->userdata);
 }
 
-static int sigfn_signal(int signum, _crt_signal_t handler)
+static int sigfn_signal(int signum, __sighandler_t handler)
 {
     int result;
 
