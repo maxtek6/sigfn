@@ -1,5 +1,5 @@
 # SigFn
 
-Bind callback functions to OS signals in C
+Bind callback functions to OS signals in C and C++
 
 # Usage

@@ -1,7 +1,27 @@
 #include "sigfn.hpp"
 
-#include <sstream>
 #include <unordered_map>
+
+sigfn::exception::exception(int status)
+{
+    if (status == SIGFN_INVALID_SIGNUM)
+    {
+        _error_message = sigfn::INVALID_SIGNUM;
+    }
+    else if (status == SIGFN_INVALID_HANDLER)
+    {
+        _error_message = sigfn::INVALID_HANDLER;
+    }
+    else
+    {
+        _error_message = "";
+    }
+}
+
+char const* sigfn::exception::what() const
+{
+    return _error_message.c_str();
+}
 
 template <class F, class... Arg>
 static void sigfn_wrapped_call(F &&function, Arg... args)
@@ -11,22 +31,9 @@ static void sigfn_wrapped_call(F &&function, Arg... args)
 
     status = function(args...);
 
-    if (status == SIGFN_INVALID_SIGNUM)
+    if (status != SIGFN_SUCCESS)
     {
-        result.second = "invalid signal";
-    }
-    else if (status == SIGFN_INVALID_HANDLER)
-    {
-        result.second = "invalid handler";
-    }
-    else
-    {
-        result.first = true;
-    }
-
-    if (!result.first)
-    {
-        throw std::runtime_error(result.second);
+        throw sigfn::exception(status);
     }
 }
 
@@ -36,13 +43,14 @@ static void handler(int signum, void *userdata);
 
 void sigfn::handle(int signum, const sigfn::handler_function &handler_function)
 {
-    handler_map.emplace(signum, handler_function);
+    sigfn_wrapped_call(sigfn_handle, signum, handler, &handler_map);
+    handler_map[signum] = handler_function;
 }
 
 void sigfn::handle(int signum, sigfn::handler_function &&handler_function)
 {
     sigfn_wrapped_call(sigfn_handle, signum, handler, &handler_map);
-    handler_map.emplace(signum, std::move(handler_function));
+    handler_map[signum] = std::move(handler_function);
 }
 
 void sigfn::ignore(int signum)
