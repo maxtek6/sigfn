@@ -1,7 +1,5 @@
 #include "sigfn.hpp"
 
-#include <unordered_map>
-
 sigfn::exception::exception(int status)
 {
     if (status == SIGFN_INVALID_SIGNUM)
@@ -18,7 +16,7 @@ sigfn::exception::exception(int status)
     }
 }
 
-char const* sigfn::exception::what() const
+char const* sigfn::exception::what() const noexcept
 {
     return _error_message.c_str();
 }

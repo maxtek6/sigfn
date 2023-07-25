@@ -5,6 +5,9 @@
 #define SIGFN_INVALID_SIGNUM 1
 #define SIGFN_INVALID_HANDLER 2
 
+#include <stdlib.h>
+#include <signal.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

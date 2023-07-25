@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <string>
+#include <unordered_map>
 
 namespace sigfn
 {
@@ -19,7 +20,7 @@ namespace sigfn
         std::string _error_message;
     public:
         exception(int status);
-        char const* what() const override;
+        const char* what() const noexcept override;
     };
 
     void handle(int signum, const handler_function &handler_function);

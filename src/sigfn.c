@@ -1,8 +1,5 @@
 #include "sigfn.h"
 
-#include <stdlib.h>
-#include <signal.h>
-
 #ifdef _WIN32
     typedef void (*__sighandler_t)(int);
 #endif
