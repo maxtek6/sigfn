@@ -6,7 +6,7 @@ add_executable(
 
 target_include_directories(unit PRIVATE ${SIGFN_INCLUDE})
 
-if(COVER)
+if(SIGFN_COVER)
     if(WIN32)
         message("skipping code coverage for windows")
     else()
