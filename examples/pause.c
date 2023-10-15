@@ -1,7 +1,5 @@
 #include <sigfn.h>
-
 #include <stdio.h>
-
 // to implement sleep_for()
 #ifdef _WIN32
 #include <Windows.h>

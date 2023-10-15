@@ -2,6 +2,6 @@ add_executable(pause pause.c)
 
 target_link_libraries(pause sigfn_a)
 
-add_executable(sigchain sigchain.cpp)
+add_executable(pause++ pause.cpp)
 
-target_link_libraries(sigchain sigfn++_a)
+target_link_libraries(pause++ sigfn++_a)
