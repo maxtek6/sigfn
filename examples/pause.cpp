@@ -1,5 +1,5 @@
 /*
-** Copyright 2023 John R. Patek Sr.
+** Copyright 2024 John R. Patek Sr.
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal

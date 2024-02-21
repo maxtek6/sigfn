@@ -1,5 +1,5 @@
 /*
-** Copyright 2023 John R. Patek Sr.
+** Copyright 2024 John R. Patek Sr.
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal
@@ -31,27 +31,60 @@
 
 namespace sigfn
 {
+    /**
+     * @brief signal handler function object type
+     *
+     * @param signum signal number
+     */
     typedef std::function<void(int)> handler_function;
 
     const std::string INVALID_SIGNUM = "sigfn: invalid signal code";
     const std::string INVALID_HANDLER = "sigfn: invalid signal handler";
-        
+
+    /**
+     * @brief sigfn exception
+     *
+     * @class exception allows sigfn error codes to be thrown as exceptions
+     */
     class exception final : public std::exception
     {
     private:
         std::string _error_message;
+
     public:
         exception(int status);
-        const char* what() const noexcept override;
+        const char *what() const noexcept override;
     };
 
+    /**
+     * @brief attach handler to specific signal using copy semantics
+     *
+     * @param signum signal to be handled
+     * @param handler_function function object associated with this signal
+     */
     void handle(int signum, const handler_function &handler_function);
 
+    /**
+     * @brief attach handler to specific signal using move semantics
+     *
+     * @param signum signal to be handled
+     * @param handler_function function object associated with this signal
+     */
     void handle(int signum, handler_function &&handler_function);
 
+    /**
+     * @brief ignore a specific signal
+     *
+     * @param signum signal to be ignored
+     */
     void ignore(int signum);
 
-    void reset(int signum); 
+    /**
+     * @brief reset a specific signal to its default behavior
+     *
+     * @param signum signal to be reset
+     */
+    void reset(int signum);
 }
 
 #endif
