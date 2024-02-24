@@ -59,7 +59,7 @@ static void test_cpp_reset();
 static void test_cpp_exception();
 
 static void echo_signum(int signum, void *userdata);
-
+// GCOV_EXCL_START
 int main(int argc, const char **argv)
 {
     const std::unordered_map<std::string, std::function<void()>> unit_tests = {
@@ -78,15 +78,7 @@ int main(int argc, const char **argv)
         try
         {
             const std::function<void()> &unit_test = unit_tests.at(argv[1]);
-            if (unit_test)
-            {
                 unit_test();
-            }
-            else
-            {
-                throw std::runtime_error(
-                    "invalid test name \"" + std::string(argv[1]) + "\"");
-            }
         }
         catch (const std::exception &exception)
         {
@@ -275,3 +267,4 @@ void echo_signum(int signum, void *userdata)
 {
     *(int *)userdata = signum;
 }
+// GCOV_EXCL_STOP
