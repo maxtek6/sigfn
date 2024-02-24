@@ -43,3 +43,9 @@ jobs:
     - name: Cover
       working-directory: ${{github.workspace}}/build
       run: make cover
+
+    - name: Upload Coverage Report
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: johnpatek/sigfn
