@@ -187,10 +187,7 @@ void test_cpp_handle()
     }
     catch (const std::exception &e)
     {
-        if (e.what() != nullptr)
-        {
-            flag = -1;
-        }
+        flag = -1;
     }
     TEST_ASSERT(flag == -1);
 
@@ -219,10 +216,7 @@ void test_cpp_ignore()
             }
             catch (const std::exception &exception)
             {
-                if (exception.what() != nullptr)
-                {
-                    has_error = true;
-                }
+                has_error = true;
             }
             TEST_ASSERT(expect_error == has_error);
         });
@@ -246,10 +240,7 @@ void test_cpp_reset()
             }
             catch (const std::exception &exception)
             {
-                if (exception.what() != nullptr)
-                {
-                    has_error = true;
-                }
+                has_error = true;
             }
             TEST_ASSERT(expect_error == has_error);
         });
