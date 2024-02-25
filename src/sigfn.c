@@ -105,10 +105,8 @@ void sigfn_handler(int signum)
         }
     }
 
-    if (mapping != NULL)
-    {
-        mapping->handler_func(mapping->signum, mapping->userdata);
-    }
+    // skip NULL check because it is unreachable
+    mapping->handler_func(mapping->signum, mapping->userdata);
 }
 
 int sigfn_signal(int signum, __sighandler_t handler)
