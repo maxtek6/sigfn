@@ -1,6 +1,6 @@
 # SigFn
 
-[![codecov](https://codecov.io/gh/johnpatek/sigfn/branch/master/graph/badge.svg)](https://codecov.io/gh/johnpatek/sigfn)
+[![codecov](https://codecov.io/gh/maxtek6/sigfn/branch/master/graph/badge.svg)](https://codecov.io/gh/maxtek6/sigfn)
 
 Bind callback functions to OS signals in C and C++.
 
