@@ -1,5 +1,5 @@
 /*
-** Copyright 2024 John R. Patek Sr.
+** Copyright 2024 Maxtek Consulting
 **
 ** Permission is hereby granted, free of charge, to any person obtaining a copy
 ** of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ static void handle_signal(int signum, void *userdata);
 // helper function to abstract platform dependent sleep functions
 static void sleep_for(int ms);
 
-int main()
+int main(int argc, const char **argv)
 {
     // used to store signum
     int flag;
