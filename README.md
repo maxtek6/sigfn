@@ -1,5 +1,6 @@
 # SigFn
 
+![status](https://github.com/maxtek6/sigfn/actions/workflows/pipeline.yml/badge.svg)
 [![codecov](https://codecov.io/gh/maxtek6/sigfn/branch/master/graph/badge.svg)](https://codecov.io/gh/maxtek6/sigfn)
 
 Bind callback functions to OS signals in C and C++.
