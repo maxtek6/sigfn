@@ -1,0 +1,20 @@
+# Use: `doxygen -g test.txt` to generate all possible settings for this file
+
+# For modern doxygen style uncomment these three lines:
+# HTML_EXTRA_STYLESHEET = @CMAKE_CURRENT_SOURCE_DIR@/doxygen/customdoxygen.css
+# HTML_HEADER = @CMAKE_CURRENT_SOURCE_DIR@/doxygen/header.html
+# HTML_FOOTER = @CMAKE_CURRENT_SOURCE_DIR@/doxygen/footer.html
+
+# not interested build output
+QUIET                  = NO
+
+# Basic settings:
+PROJECT_NAME           = "SigFn"
+#PROJECT_NUMBER         = @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@
+INPUT                  = @PROJECT_SOURCE_DIR@ \
+                         @PROJECT_SOURCE_DIR@/docs
+FILE_PATTERNS          = *.hpp \
+                         *.md
+EXTRACT_ALL            = YES
+OUTPUT_DIRECTORY       = @CMAKE_BINARY_DIR@/docs
+USE_MDFILE_AS_MAINPAGE = mainpage.md
