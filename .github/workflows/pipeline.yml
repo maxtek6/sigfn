@@ -49,3 +49,15 @@ jobs:
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: maxtek6/sigfn
+  
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Configure
+      run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSIGFN_DOCS=ON
+
+    - name: Build
+      run: make docs
