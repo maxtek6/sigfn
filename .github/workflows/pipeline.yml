@@ -56,6 +56,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install Doxygen
+      uses: ssciwr/doxygen-install@v1
+    
     - name: Configure
       run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DSIGFN_DOCS=ON
 
