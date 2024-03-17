@@ -25,7 +25,7 @@
 
 /**
  * @file sigfn.h
- * @brief SigFn header file
+ * @brief SigFn C interface
  */
 
 #define SIGFN_SUCCESS 0
@@ -53,21 +53,21 @@ extern "C"
      *
      * @param signum signal to be handled
      * @param handler function associated with this signal
-     * @param userdata optional user data to be passed to the function
+     * @param userdata optional user data passed to the function
      */
     int sigfn_handle(int signum, sigfn_handler_func handler, void *userdata);
 
     /**
      * @brief ignore a specific signal
      *
-     * @param signum signal to be ignored
+     * @param signum signal to ignore
      */
     int sigfn_ignore(int signum);
 
     /**
      * @brief reset a specific signal to its default behavior
      *
-     * @param signum signal to be reset
+     * @param signum signal to reset
      */
     int sigfn_reset(int signum);
 
