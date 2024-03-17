@@ -80,7 +80,7 @@ void sleep_for(int ms)
 
 Basic SigFn usage in C++:
 
-```c++
+```cpp
 #include <sigfn.hpp>
 #include <iostream>
 #include <thread>
