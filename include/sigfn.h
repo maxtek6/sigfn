@@ -35,6 +35,12 @@
 #include <stdlib.h>
 #include <signal.h>
 
+#ifdef _WIN32
+#define DLL_EXPORT __declspec(dllexport)
+#else
+#define DLL_EXPORT
+#endif
+
 #ifdef __cplusplus
 extern "C"
 {
@@ -55,21 +61,21 @@ extern "C"
      * @param handler function associated with this signal
      * @param userdata optional user data passed to the function
      */
-    int sigfn_handle(int signum, sigfn_handler_func handler, void *userdata);
+    DLL_EXPORT int sigfn_handle(int signum, sigfn_handler_func handler, void *userdata);
 
     /**
      * @brief ignore a specific signal
      *
      * @param signum signal to ignore
      */
-    int sigfn_ignore(int signum);
+    DLL_EXPORT int sigfn_ignore(int signum);
 
     /**
      * @brief reset a specific signal to its default behavior
      *
      * @param signum signal to reset
      */
-    int sigfn_reset(int signum);
+    DLL_EXPORT int sigfn_reset(int signum);
 
 #ifdef __cplusplus
 }

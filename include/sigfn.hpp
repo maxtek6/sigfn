@@ -46,7 +46,7 @@ namespace sigfn
      *
      * @class exception allows sigfn error codes to be thrown as exceptions
      */
-    class exception final : public std::exception
+    class DLL_EXPORT exception final : public std::exception
     {
     private:
         std::string _error_message;
@@ -62,7 +62,7 @@ namespace sigfn
      * @param signum signal to be handled
      * @param handler_function function object associated with this signal
      */
-    void handle(int signum, const handler_function &handler_function);
+    DLL_EXPORT void handle(int signum, const handler_function &handler_function);
 
     /**
      * @brief attach handler to specific signal using move semantics
@@ -70,21 +70,21 @@ namespace sigfn
      * @param signum signal to be handled
      * @param handler_function function object associated with this signal
      */
-    void handle(int signum, handler_function &&handler_function);
+    DLL_EXPORT void handle(int signum, handler_function &&handler_function);
 
     /**
      * @brief ignore a specific signal
      *
      * @param signum signal to be ignored
      */
-    void ignore(int signum);
+    DLL_EXPORT void ignore(int signum);
 
     /**
      * @brief reset a specific signal to its default behavior
      *
      * @param signum signal to be reset
      */
-    void reset(int signum);
+    DLL_EXPORT void reset(int signum);
 }
 
 #endif
