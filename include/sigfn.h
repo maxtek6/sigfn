@@ -60,6 +60,7 @@ extern "C"
      * @param signum signal to be handled
      * @param handler function associated with this signal
      * @param userdata optional user data passed to the function
+     * @returns 0 on success, non-zero on error
      */
     DLL_EXPORT int sigfn_handle(int signum, sigfn_handler_func handler, void *userdata);
 
@@ -67,6 +68,7 @@ extern "C"
      * @brief ignore a specific signal
      *
      * @param signum signal to ignore
+     * @returns 0 on success, non-zero on error
      */
     DLL_EXPORT int sigfn_ignore(int signum);
 
@@ -74,6 +76,7 @@ extern "C"
      * @brief reset a specific signal to its default behavior
      *
      * @param signum signal to reset
+     * @returns 0 on success, non-zero on error
      */
     DLL_EXPORT int sigfn_reset(int signum);
 
