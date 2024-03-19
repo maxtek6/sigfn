@@ -23,6 +23,12 @@
 #ifndef SIGFN_HPP
 #define SIGFN_HPP
 
+/**
+ * @file sigfn.hpp
+ * @brief SigFn C++ interface
+ * @author John R. Patek Sr.
+ */
+
 #include "sigfn.h"
 
 #include <functional>

@@ -26,6 +26,7 @@
 /**
  * @file sigfn.h
  * @brief SigFn C interface
+ * @author John R. Patek Sr.
  */
 
 #define SIGFN_SUCCESS 0
