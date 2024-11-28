@@ -24,16 +24,11 @@
 
 static std::string error_message(int status)
 {
-    std::string result;
-    if (status == SIGFN_INVALID_SIGNUM)
-    {
-        result = sigfn::INVALID_SIGNUM;
-    }
-    else if (status == SIGFN_INVALID_HANDLER)
-    {
-        result = sigfn::INVALID_HANDLER;
-    }
-    return result;
+    const static std::unordered_map<int,std::string> error_messages = {
+        {SIGFN_INVALID_SIGNUM, sigfn::INVALID_SIGNUM},
+        {SIGFN_INVALID_HANDLER, sigfn::INVALID_HANDLER}
+    };
+    return error_messages.at(status);
 }
 
 
