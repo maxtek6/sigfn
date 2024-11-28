@@ -31,6 +31,7 @@
 
 #include "sigfn.h"
 
+#include <stdexcept>
 #include <functional>
 #include <string>
 #include <unordered_map>
@@ -46,32 +47,6 @@ namespace sigfn
 
     const std::string INVALID_SIGNUM = "sigfn: invalid signal code";
     const std::string INVALID_HANDLER = "sigfn: invalid signal handler";
-
-    /**
-     * @brief sigfn exception
-     *
-     * @class exception allows sigfn error codes to be thrown as exceptions
-     */
-    class DLL_EXPORT exception final : public std::exception
-    {
-    private:
-        std::string _error_message;
-
-    public:
-        /**
-         * @brief create an exception based on a status code
-         *
-         * @param status error code that maps to an error message
-         */
-        exception(int status);
-
-        /**
-         * @brief what override for std::exception
-         * 
-         * @returns null-terminated char buffer containing error message
-         */
-        const char *what() const noexcept override;
-    };
 
     /**
      * @brief attach handler to specific signal using copy semantics

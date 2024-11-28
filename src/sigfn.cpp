@@ -22,26 +22,15 @@
 
 #include "sigfn.hpp"
 
-sigfn::exception::exception(int status)
+static std::string error_message(int status)
 {
-    if (status == SIGFN_INVALID_SIGNUM)
-    {
-        _error_message = sigfn::INVALID_SIGNUM;
-    }
-    else if (status == SIGFN_INVALID_HANDLER)
-    {
-        _error_message = sigfn::INVALID_HANDLER;
-    }
-    else
-    {
-        _error_message = "";
-    }
+    const static std::unordered_map<int,std::string> error_messages = {
+        {SIGFN_INVALID_SIGNUM, sigfn::INVALID_SIGNUM},
+        {SIGFN_INVALID_HANDLER, sigfn::INVALID_HANDLER}
+    };
+    return error_messages.at(status);
 }
 
-char const* sigfn::exception::what() const noexcept
-{
-    return _error_message.c_str();
-}
 
 template <class F, class... Arg>
 static void sigfn_wrapped_call(F &&function, Arg... args)
@@ -53,7 +42,7 @@ static void sigfn_wrapped_call(F &&function, Arg... args)
 
     if (status != SIGFN_SUCCESS)
     {
-        throw sigfn::exception(status);
+        throw std::runtime_error(error_message(status));
     }
 }
 
