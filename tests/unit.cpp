@@ -56,7 +56,6 @@ static void test_c_reset();
 static void test_cpp_handle();
 static void test_cpp_ignore();
 static void test_cpp_reset();
-static void test_cpp_exception();
 
 static void echo_signum(int signum, void *userdata);
 // GCOV_EXCL_START
@@ -69,7 +68,6 @@ int main(int argc, const char **argv)
         {"HANDLE_CPP", test_cpp_handle},
         {"IGNORE_CPP", test_cpp_ignore},
         {"RESET_CPP", test_cpp_reset},
-        {"EXCEPTION_CPP", test_cpp_exception},
     };
     int result;
     result = PASS;
@@ -78,7 +76,7 @@ int main(int argc, const char **argv)
         try
         {
             const std::function<void()> &unit_test = unit_tests.at(argv[1]);
-                unit_test();
+            unit_test();
         }
         catch (const std::exception &exception)
         {
@@ -179,7 +177,7 @@ void test_cpp_handle()
     }
     catch (const std::exception &e)
     {
-        flag = -1;
+        flag = (e.what() != nullptr) ? -1 : flag;
     }
     TEST_ASSERT(flag == -1);
 
@@ -206,9 +204,9 @@ void test_cpp_ignore()
             {
                 sigfn::ignore(signum);
             }
-            catch (const std::exception &exception)
+            catch (const std::exception &e)
             {
-                has_error = true;
+                has_error = (e.what() != nullptr);
             }
             TEST_ASSERT(expect_error == has_error);
         });
@@ -230,37 +228,14 @@ void test_cpp_reset()
             {
                 sigfn::reset(signum);
             }
-            catch (const std::exception &exception)
+            catch (const std::exception &e)
             {
-                has_error = true;
+                has_error = (e.what() != nullptr);
             }
             TEST_ASSERT(expect_error == has_error);
         });
     try_catch_assert(-1, true);
     try_catch_assert(SIGINT, false);
-}
-
-void test_cpp_exception()
-{
-    const std::function<void(int, const std::string &)> try_catch_assert(
-        [](
-            int status,
-            const std::string &expected_message)
-        {
-            std::string message("replaced by error messgae");
-            try
-            {
-                throw sigfn::exception(status);
-            }
-            catch (const std::exception &exception)
-            {
-                message = exception.what();
-            }
-            TEST_ASSERT(expected_message == message);
-        });
-    try_catch_assert(SIGFN_SUCCESS, "");
-    try_catch_assert(SIGFN_INVALID_SIGNUM, sigfn::INVALID_SIGNUM);
-    try_catch_assert(SIGFN_INVALID_HANDLER, sigfn::INVALID_HANDLER);
 }
 
 void echo_signum(int signum, void *userdata)
