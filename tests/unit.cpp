@@ -56,6 +56,7 @@ static void test_c_reset();
 static void test_cpp_handle();
 static void test_cpp_ignore();
 static void test_cpp_reset();
+static void test_cpp_exception();
 
 static void echo_signum(int signum, void *userdata);
 // GCOV_EXCL_START
@@ -68,6 +69,7 @@ int main(int argc, const char **argv)
         {"HANDLE_CPP", test_cpp_handle},
         {"IGNORE_CPP", test_cpp_ignore},
         {"RESET_CPP", test_cpp_reset},
+        {"EXCEPTION_CPP", test_cpp_exception},
     };
     int result;
     result = PASS;
@@ -236,6 +238,32 @@ void test_cpp_reset()
         });
     try_catch_assert(-1, true);
     try_catch_assert(SIGINT, false);
+}
+
+void test_cpp_exception()
+{
+    const sigfn::handler_function valid_handler = [](int signum)
+    {
+    };
+    const std::function<void(int, sigfn::handler_function)> try_catch_assert(
+        [](
+            int signum,
+            const sigfn::handler_function& handler)
+        {
+            bool has_error;
+
+            has_error = false;
+            try
+            {
+                sigfn::handle(signum, handler);
+            }
+            catch (const std::exception &e)
+            {
+                has_error = (e.what() != nullptr);
+            }
+            TEST_ASSERT(has_error);
+        });
+    try_catch_assert(-1, valid_handler);
 }
 
 void echo_signum(int signum, void *userdata)

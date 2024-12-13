@@ -1,8 +1,8 @@
 add_executable(
     unit 
     unit.cpp
-    ${CMAKE_SOURCE_DIR}/src/sigfn.c
-    ${CMAKE_SOURCE_DIR}/src/sigfn.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/sigfn.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/../src/sigfn.cpp)
 
 target_include_directories(unit PRIVATE ${SIGFN_INCLUDE})
 
@@ -27,3 +27,4 @@ add_test(NAME test_c_reset COMMAND unit RESET_C)
 add_test(NAME test_cpp_handle COMMAND unit HANDLE_CPP)
 add_test(NAME test_cpp_ignore COMMAND unit IGNORE_CPP)
 add_test(NAME test_cpp_reset COMMAND unit RESET_CPP)
+add_test(NAME test_cpp_exception COMMAND unit EXCEPTION_CPP)
