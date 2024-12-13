@@ -10,7 +10,7 @@ if(SIGFN_COVER)
     if(WIN32)
         message("skipping code coverage for windows")
     else()
-        target_compile_options(unit PRIVATE "${CMAKE_C_FLAGS} ${CMAKE_CXX_FLAGS} -fprofile-arcs -ftest-coverage -g -O0")        
+        target_compile_options(unit PRIVATE -fprofile-arcs -ftest-coverage -g -O0)        
         add_custom_target(
             cover
             DEPENDS unit)
