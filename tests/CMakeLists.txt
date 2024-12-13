@@ -11,7 +11,7 @@ if(SIGFN_COVER)
         message("skipping code coverage for windows")
     else()
         target_compile_options(unit PRIVATE -fprofile-arcs -ftest-coverage -g -O0)
-        target_link_libraries(unit PRIVATE gcov)        
+        target_link_libraries(unit PRIVATE gcov "--coverage")        
         add_custom_target(
             cover
             DEPENDS unit)
