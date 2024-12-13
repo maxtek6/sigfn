@@ -17,7 +17,7 @@ if(SIGFN_COVER)
             DEPENDS unit)
         add_custom_command(
             TARGET cover
-            COMMAND gcovr -r ${CMAKE_SOURCE_DIR} -e ${CMAKE_SOURCE_DIR}/tests)
+            COMMAND gcovr -r ${CMAKE_CURRENT_SOURCE_DIR}/.. -e ${CMAKE_CURRENT_SOURCE_DIR})
     endif()
 endif()
 
