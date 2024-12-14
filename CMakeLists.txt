@@ -8,6 +8,7 @@ option(SIGFN_EXAMPLES "Build SigFn examples" OFF)
 option(SIGFN_DOCS "Build documentation" OFF)
 
 set(SIGFN_INCLUDE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+file(GLOB SIGFN_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/*.hpp)
 
 add_subdirectory(src)
 

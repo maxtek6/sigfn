@@ -1,10 +1,9 @@
 add_executable(
     unit 
     unit.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/sigfn.c
-    ${CMAKE_CURRENT_SOURCE_DIR}/../src/sigfn.cpp)
+    ${SIGFN_SOURCES})
 
-target_include_directories(unit PRIVATE ${SIGFN_INCLUDE})
+target_include_directories(unit PRIVATE ${SIGFN_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
 
 if(SIGFN_COVER)
     if(WIN32)
@@ -21,10 +20,10 @@ if(SIGFN_COVER)
         endif()
 endif()
 
-add_test(NAME test_c_handle COMMAND unit HANDLE_C)
-add_test(NAME test_c_ignore COMMAND unit IGNORE_C)
-add_test(NAME test_c_reset COMMAND unit RESET_C)
-add_test(NAME test_cpp_handle COMMAND unit HANDLE_CPP)
-add_test(NAME test_cpp_ignore COMMAND unit IGNORE_CPP)
-add_test(NAME test_cpp_reset COMMAND unit RESET_CPP)
-add_test(NAME test_cpp_exception COMMAND unit EXCEPTION_CPP)
+add_test(NAME sigfn_handle COMMAND unit sigfn_handle )
+add_test(NAME sigfn_ignore COMMAND unit sigfn_ignore)
+add_test(NAME sigfn_reset COMMAND unit sigfn_reset)
+add_test(NAME sigfn_error COMMAND unit sigfn_error)
+add_test(NAME sigfn::handle COMMAND unit sigfn::handle)
+add_test(NAME sigfn::ignore COMMAND unit sigfn::ignore)
+add_test(NAME sigfn::reset COMMAND unit sigfn::reset)
