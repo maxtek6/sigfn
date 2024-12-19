@@ -1,9 +1,19 @@
+include(FetchContent)
+FetchContent_Declare(
+    Maxtest
+    GIT_REPOSITORY https://github.com/maxtek6/maxtest.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(Maxtest)
+
 add_executable(
     unit 
     unit.cpp
     ${SIGFN_SOURCES})
 
 target_include_directories(unit PRIVATE ${SIGFN_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../src)
+
+target_link_libraries(unit Maxtest::Maxtest)
 
 if(SIGFN_COVER)
     if(WIN32)
@@ -20,10 +30,10 @@ if(SIGFN_COVER)
         endif()
 endif()
 
-add_test(NAME sigfn_handle COMMAND unit sigfn_handle )
-add_test(NAME sigfn_ignore COMMAND unit sigfn_ignore)
-add_test(NAME sigfn_reset COMMAND unit sigfn_reset)
-add_test(NAME sigfn_error COMMAND unit sigfn_error)
-add_test(NAME sigfn::handle COMMAND unit sigfn::handle)
-add_test(NAME sigfn::ignore COMMAND unit sigfn::ignore)
-add_test(NAME sigfn::reset COMMAND unit sigfn::reset)
+maxtest_add_test(unit sigfn_handle "")
+maxtest_add_test(unit sigfn_ignore "")
+maxtest_add_test(unit sigfn_reset "")
+maxtest_add_test(unit sigfn_error "")
+maxtest_add_test(unit sigfn::handle "")
+maxtest_add_test(unit sigfn::ignore "")
+maxtest_add_test(unit sigfn::reset "")

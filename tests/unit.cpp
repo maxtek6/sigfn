@@ -20,11 +20,8 @@
  * SOFTWARE.
  */
 
+#include <maxtest.hpp>
 #include "internal.hpp"
-
-#include <iostream>
-#include <sstream>
-#include <unordered_map>
 
 #define PASS 0
 #define FAIL 1
@@ -40,219 +37,154 @@
 #endif
 #endif
 
-#define TEST_ASSERT(COND) test_assert((COND), __FILE__, __FUNCTION_NAME__, __LINE__, #COND)
-
-static void test_assert(
-    bool condition,
-    const std::string &file,
-    const std::string &function,
-    int line,
-    const std::string &description);
-
-namespace c
-{
-    static void sigfn_handle();
-    static void sigfn_ignore();
-    static void sigfn_reset();
-    static void sigfn_error();
-}
-
-namespace cpp
-{
-    static void sigfn_handle();
-    static void sigfn_ignore();
-    static void sigfn_reset();
-}
-
 static void echo_signum(int signum, void *userdata);
+
 // GCOV_EXCL_START
-int main(int argc, const char **argv)
+MAXTEST_MAIN
 {
-    const std::unordered_map<std::string, std::function<void()>> unit_tests = {
-        {"sigfn_handle", c::sigfn_handle},
-        {"sigfn_ignore", c::sigfn_ignore},
-        {"sigfn_reset", c::sigfn_reset},
-        {"sigfn_error", c::sigfn_error},
-        {"sigfn::handle", cpp::sigfn_handle},
-        {"sigfn::ignore", cpp::sigfn_ignore},
-        {"sigfn::reset", cpp::sigfn_reset},
+    MAXTEST_TEST_CASE(sigfn_handle)
+    {
+        int result;
+        int signum(SIGINT);
+        int flag(INVALID_SIGNUM);
+        result = ::sigfn_handle(signum, echo_signum, &flag);
+        MAXTEST_ASSERT(result == PASS);
+        raise(signum);
+        MAXTEST_ASSERT(flag == signum);
     };
-    int result;
-    result = PASS;
-    if (argc > 1)
+
+    MAXTEST_TEST_CASE(sigfn_ignore)
     {
-        try
-        {
-            const std::function<void()> &unit_test = unit_tests.at(argv[1]);
-            unit_test();
-        }
-        catch (const std::exception &exception)
-        {
-            std::cerr << exception.what() << std::endl;
-            result = FAIL;
-        }
-    }
-    return result;
-}
-
-void test_assert(
-    bool condition,
-    const std::string &file,
-    const std::string &function,
-    int line,
-    const std::string &description)
-{
-    std::stringstream error_stream;
-    if (!condition)
-    {
-        error_stream << file << ":" << function << ":" << line << ":"
-                     << " failed to assert \"" << description << "\"";
-        throw std::runtime_error(error_stream.str());
-    }
-}
-
-void c::sigfn_handle()
-{
-    int result;
-    int signum(SIGINT);
-    int flag(INVALID_SIGNUM);
-    result = ::sigfn_handle(signum, echo_signum, &flag);
-    TEST_ASSERT(result == PASS);
-    raise(signum);
-    TEST_ASSERT(flag == signum);
-}
-
-void c::sigfn_ignore()
-{
-    TEST_ASSERT(::sigfn_ignore(INVALID_SIGNUM) == -1);
-    TEST_ASSERT(::sigfn_ignore(SIGINT) == 0);
-}
-
-void c::sigfn_reset()
-{
-    TEST_ASSERT(::sigfn_reset(INVALID_SIGNUM) == -1);
-    TEST_ASSERT(::sigfn_reset(SIGINT) == 0);
-}
-
-void c::sigfn_error()
-{
-    int flag;
-    std::string error;
-    ::sigfn_handle(INVALID_SIGNUM, echo_signum, &flag);
-    error = ::sigfn_error();
-    TEST_ASSERT(error == sigfn::internal::invalid_syscall);
-    ::sigfn_handle(SIGINT, INVALID_HANDLER, &flag);
-    error = ::sigfn_error();
-    TEST_ASSERT(error == sigfn::internal::invalid_handler);
-    ::sigfn_handle(SIGINT, echo_signum, &flag);
-    TEST_ASSERT(::sigfn_error() == nullptr);
-}
-
-void cpp::sigfn_handle()
-{
-    int flag(0);
-    const sigfn::handler_function invalid_copy;
-    const sigfn::handler_function valid_copy = [&](int signum) 
-    {
-        flag = 1;
+        MAXTEST_ASSERT(::sigfn_ignore(INVALID_SIGNUM) == -1);
+        MAXTEST_ASSERT(::sigfn_ignore(SIGINT) == 0);
     };
-    sigfn::handler_function invalid_move;
-    sigfn::handler_function valid_move = [&](int signum) 
+
+    MAXTEST_TEST_CASE(sigfn_reset)
     {
-        flag = 2;
+        MAXTEST_ASSERT(::sigfn_reset(INVALID_SIGNUM) == -1);
+        MAXTEST_ASSERT(::sigfn_reset(SIGINT) == 0);
     };
-    
-    const std::function<void(int, const sigfn::handler_function&, const std::string&)> try_catch_copy(
-        [](
-            int signum,
-            const sigfn::handler_function &handler,
-            const std::string& expected_error)
-        {
-            std::string actual_error;
-            try
-            {
-                sigfn::handle(signum, handler);
-            }
-            catch (const std::exception &e)
-            {
-                actual_error = e.what();
-            }
-            TEST_ASSERT(expected_error == actual_error);
-        });
-    const std::function<void(int, sigfn::handler_function&&, const std::string&)> try_catch_move(
-        [](
-            int signum,
-            sigfn::handler_function &&handler,
-            const std::string& expected_error)
-        {
-            std::string actual_error;
-            try
-            {
-                sigfn::handle(signum, std::move(handler));
-            }
-            catch (const std::exception &e)
-            {
-                actual_error = e.what();
-            }
-            TEST_ASSERT(expected_error == actual_error);
-        });
-    try_catch_copy(INVALID_SIGNUM, valid_copy, sigfn::internal::invalid_syscall);
-    try_catch_copy(SIGINT, invalid_copy, sigfn::internal::invalid_handler);
-    try_catch_copy(SIGINT, valid_copy, "");
-    raise(SIGINT);
-    TEST_ASSERT(flag == 1);
-    try_catch_move(SIGINT, std::move(invalid_move), sigfn::internal::invalid_handler);
-    try_catch_move(SIGINT, std::move(valid_move), "");
-    raise(SIGINT);
-    TEST_ASSERT(flag == 2);
-}
 
-void cpp::sigfn_ignore()
-{
-    const std::function<void(int, bool)> try_catch_assert(
-        [](
-            int signum,
-            bool expect_error)
+    MAXTEST_TEST_CASE(sigfn_error)
+    {
+        int flag;
+        std::string error;
+        ::sigfn_handle(INVALID_SIGNUM, echo_signum, &flag);
+        error = ::sigfn_error();
+        MAXTEST_ASSERT(error == sigfn::internal::invalid_syscall);
+        ::sigfn_handle(SIGINT, INVALID_HANDLER, &flag);
+        error = ::sigfn_error();
+        MAXTEST_ASSERT(error == sigfn::internal::invalid_handler);
+        ::sigfn_handle(SIGINT, echo_signum, &flag);
+        MAXTEST_ASSERT(::sigfn_error() == nullptr);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::handle)
+    {
+        int flag(0);
+        const sigfn::handler_function invalid_copy;
+        const sigfn::handler_function valid_copy = [&](int signum)
         {
-            bool has_error;
-
-            has_error = false;
-            try
-            {
-                sigfn::ignore(signum);
-            }
-            catch (const std::exception &e)
-            {
-                has_error = (e.what() != nullptr);
-            }
-            TEST_ASSERT(expect_error == has_error);
-        });
-    try_catch_assert(INVALID_SIGNUM, true);
-    try_catch_assert(SIGINT, false);
-}
-
-void cpp::sigfn_reset()
-{
-    const std::function<void(int, bool)> try_catch_assert(
-        [](
-            int signum,
-            bool expect_error)
+            flag = 1;
+        };
+        sigfn::handler_function invalid_move;
+        sigfn::handler_function valid_move = [&](int signum)
         {
-            bool has_error;
+            flag = 2;
+        };
 
-            has_error = false;
-            try
+        const std::function<void(int, const sigfn::handler_function &, const std::string &)> try_catch_copy(
+            [](
+                int signum,
+                const sigfn::handler_function &handler,
+                const std::string &expected_error)
             {
-                sigfn::reset(signum);
-            }
-            catch (const std::exception &e)
+                std::string actual_error;
+                try
+                {
+                    sigfn::handle(signum, handler);
+                }
+                catch (const std::exception &e)
+                {
+                    actual_error = e.what();
+                }
+                MAXTEST_ASSERT(expected_error == actual_error);
+            });
+        const std::function<void(int, sigfn::handler_function &&, const std::string &)> try_catch_move(
+            [](
+                int signum,
+                sigfn::handler_function &&handler,
+                const std::string &expected_error)
             {
-                has_error = (e.what() != nullptr);
-            }
-            TEST_ASSERT(expect_error == has_error);
-        });
-    try_catch_assert(INVALID_SIGNUM, true);
-    try_catch_assert(SIGINT, false);
+                std::string actual_error;
+                try
+                {
+                    sigfn::handle(signum, std::move(handler));
+                }
+                catch (const std::exception &e)
+                {
+                    actual_error = e.what();
+                }
+                MAXTEST_ASSERT(expected_error == actual_error);
+            });
+        try_catch_copy(INVALID_SIGNUM, valid_copy, sigfn::internal::invalid_syscall);
+        try_catch_copy(SIGINT, invalid_copy, sigfn::internal::invalid_handler);
+        try_catch_copy(SIGINT, valid_copy, "");
+        raise(SIGINT);
+        MAXTEST_ASSERT(flag == 1);
+        try_catch_move(SIGINT, std::move(invalid_move), sigfn::internal::invalid_handler);
+        try_catch_move(SIGINT, std::move(valid_move), "");
+        raise(SIGINT);
+        MAXTEST_ASSERT(flag == 2);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::ignore)
+    {
+        const std::function<void(int, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error)
+            {
+                bool has_error;
+
+                has_error = false;
+                try
+                {
+                    sigfn::ignore(signum);
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+            });
+        try_catch_assert(INVALID_SIGNUM, true);
+        try_catch_assert(SIGINT, false);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::reset)
+    {
+        const std::function<void(int, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error)
+            {
+                bool has_error;
+
+                has_error = false;
+                try
+                {
+                    sigfn::reset(signum);
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+            });
+        try_catch_assert(INVALID_SIGNUM, true);
+        try_catch_assert(SIGINT, false);
+    };
 }
 
 void echo_signum(int signum, void *userdata)
