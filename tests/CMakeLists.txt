@@ -16,10 +16,10 @@ target_include_directories(unit PRIVATE ${SIGFN_INCLUDE} ${CMAKE_CURRENT_SOURCE_
 if(SIGFN_COVER)
     if(WIN32)
         message("skipping code coverage for windows")
-        target_link_libraries(unit Maxtest::Maxtest)
+        target_link_libraries(unit PRIVATE Maxtest::Maxtest)
     else()
         target_compile_options(unit PRIVATE -fprofile-arcs -ftest-coverage -g -O0)
-        target_link_libraries(unit Maxtest::Maxtest PRIVATE gcov "--coverage")        
+        target_link_libraries(unit PRIVATE Maxtest::Maxtest gcov "--coverage")        
         add_custom_target(
             cover
             DEPENDS unit)
@@ -28,7 +28,7 @@ if(SIGFN_COVER)
             COMMAND gcovr -r ${CMAKE_CURRENT_SOURCE_DIR}/.. -e ${CMAKE_CURRENT_SOURCE_DIR})
         endif()
 else()
-    target_link_libraries(unit Maxtest::Maxtest)
+    target_link_libraries(unit PRIVATE Maxtest::Maxtest)
 endif()
 
 maxtest_add_test(unit sigfn_handle "")
