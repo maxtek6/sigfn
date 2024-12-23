@@ -10,9 +10,17 @@ Bind callback functions to OS signals in C and C++.
 SigFn should work in any system with the standard C library,
 which provides the `<signal.h>` header.
 
-## Usage
+## Building Unit Tests
+```bash
+cmake -S . -B build -DSIGFN_TESTS=ON
+cmake --build build
+```
 
-SigFn usage is similar to the `os/signal` package from Golang.
+## Running Unit Tests
+```bash
+cd build
+ctest -C Debug
+```
 
 ### C
 
