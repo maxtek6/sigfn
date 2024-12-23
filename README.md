@@ -12,23 +12,15 @@ which provides the `<signal.h>` header.
 
 ## Building Unit Tests
 ```bash
-cd <sigfn_root_dir>
-mkdir build && cd build
-cmake .. -DSIGFN_TESTS=ON
-make
+cmake -S . -B build -DSIGFN_TESTS=ON
+cmake --build build
 ```
 
 ## Running Unit Tests
 ```bash
-cd <signfn_root_dir>/build/tests
-./unit <unit-test-name>
-# e.g.
-./unit sigfn_handle
+cd build
+ctest -C Debug
 ```
-
-## Usage
-
-SigFn usage is similar to the `os/signal` package from Golang.
 
 ### C
 
