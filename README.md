@@ -7,20 +7,45 @@ Bind callback functions to OS signals in C and C++.
 
 ## Requirements
 
-SigFn should work in any system with the standard C library,
-which provides the `<signal.h>` header.
+SigFn has the following requirements:
 
-## Building Unit Tests
++ C++11
++ CMake >= 3.10
+
+## Building
+
+SigFn can be built in a few steps using cmake.
+
+### CMake Configuration and Build
+
+A standard build will provide the shared and static libraries:
+
 ```bash
-cmake -S . -B build -DSIGFN_TESTS=ON
+cmake -S . -B build
 cmake --build build
 ```
 
-## Running Unit Tests
+A few optional flags can be specified in the configuration:
+
++ `SIGFN_TESTS`: Build unit tests
++ `SIGFN_COVER`: Evaluate code coverage(requires `SIGFN_TESTS`, not supported on Windows)
++ `SIGFN_EXAMPLES`: Build SigFn C and C++ examples
++ `SIGFN_DOCS`: Build documentation using DOXYGEN
+
+### Running Unit Tests
+
+The unit tests can be built and run using the following commands:
+
 ```bash
+cmake -S . -B build -DSIGFN_TESTS=ON
+cmake --build build
 cd build
 ctest -C Debug
 ```
+
+## Usage
+
+SigFn provides `sigfn.h` and `sigfn.hpp` for usage with C and C++, respectively.
 
 ### C
 
