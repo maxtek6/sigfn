@@ -22,6 +22,10 @@ cmake_minimum_required(VERSION 3.15)
 
 project(sigfn)
 
+find_package(Threads REQUIRED)
+
+include(FetchContent)
+
 option(SIGFN_TESTS "Build test suite" OFF)
 option(SIGFN_COVER "Add code coverage" OFF)
 option(SIGFN_EXAMPLES "Build SigFn examples" OFF)

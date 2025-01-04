@@ -30,10 +30,14 @@
  */
 
 #include <csignal>
-#include <stdexcept>
+#include <chrono>
 #include <functional>
+#include <initializer_list>
+#include <optional>
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <thread>
 
 #ifdef _WIN32
 #define DLL_EXPORT __declspec(dllexport)
@@ -79,6 +83,12 @@ namespace sigfn
      * @param signum signal to be reset
      */
     DLL_EXPORT void reset(int signum);
+
+    DLL_EXPORT int wait(std::initializer_list<int> signums);
+
+    DLL_EXPORT std::optional<int> wait_for(std::initializer_list<int> signums, const std::chrono::system_clock::duration &timeout);
+
+    DLL_EXPORT std::optional<int> wait_until(std::initializer_list<int> signums, const std::chrono::system_clock::time_point &deadline);
 }
 
 #endif

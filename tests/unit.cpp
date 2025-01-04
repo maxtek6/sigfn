@@ -65,6 +65,23 @@ MAXTEST_MAIN
         MAXTEST_ASSERT(::sigfn_reset(SIGINT) == 0);
     };
 
+    MAXTEST_TEST_CASE(sigfn_wait)
+    {
+        const int signums[1] = {SIGINT};
+        int signum(INVALID_SIGNUM);
+        int result;
+        std::thread signaler([&]()
+        {
+            std::cout << "sleeping" << std::endl;
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::cout << "signaling" << std::endl;
+            std::raise(signums[0]);
+        });
+        result = ::sigfn_wait(&signums[0], 1, &signum);
+        MAXTEST_ASSERT(result == PASS);
+        MAXTEST_ASSERT(signums[0] == signum);
+    };
+
     MAXTEST_TEST_CASE(sigfn_error)
     {
         int flag;

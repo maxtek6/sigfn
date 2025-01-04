@@ -29,22 +29,24 @@
  * @author John R. Patek Sr.
  */
 
-#define SIGFN_SUCCESS 0
-#define SIGFN_INVALID_SIGNUM 1
-#define SIGFN_INVALID_HANDLER 2
-
 #include <stdlib.h>
 #include <signal.h>
-
-#ifdef _WIN32
-#define DLL_EXPORT __declspec(dllexport)
-#else
-#define DLL_EXPORT
-#endif
 
 #ifdef __cplusplus
 extern "C"
 {
+#endif
+
+#ifdef _WIN32
+#define DLL_EXPORT __declspec(dllexport)
+    struct timeval
+    {
+        uint64_t tv_sec;
+        uint64_t tv_usec;
+    };
+#else
+#define DLL_EXPORT
+#include <sys/time.h>
 #endif
 
     /**
@@ -80,6 +82,38 @@ extern "C"
      * @returns 0 on success, -1 on error
      */
     DLL_EXPORT int sigfn_reset(int signum);
+
+    /**
+     * @brief wait for any of the specified signals
+     *
+     * @param signums array of signal numbers
+     * @param count number of signals in the array
+     * @param received signal number that was received, can be NULL
+     * @returns 0 on success, -1 on error
+     */
+    DLL_EXPORT int sigfn_wait(const int *signums, size_t count, int *received);
+
+    /**
+     * @brief wait for any of the specified signals with a timeout
+     *
+     * @param signums array of signal numbers
+     * @param count number of signals in the array
+     * @param received signal number that was received, can be NULL
+     * @param timeout maximum time to wait
+     * @returns 0 on success, -1 on error, 1 if timed out
+     */
+    DLL_EXPORT int sigfn_wait_for(const int *signums, size_t count, int *received, const struct timeval *timeout);
+
+    /**
+     * @brief wait for any of the specified signals until a deadline
+     *
+     * @param signums array of signal numbers
+     * @param count number of signals in the array
+     * @param received signal number that was received, can be NULL
+     * @param deadline time to stop waiting
+     * @returns 0 on success, -1 on error, 1 if timed out
+     */
+    DLL_EXPORT int sigfn_wait_until(const int *signums, size_t count, int *received, const struct timeval *deadline);
 
     /**
      * @brief get the last error message

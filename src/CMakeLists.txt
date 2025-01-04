@@ -18,13 +18,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+FetchContent_Declare(
+    Channels
+    GIT_REPOSITORY https://github.com/johnpatek/channels.git
+    GIT_TAG master
+)
+FetchContent_MakeAvailable(Channels)
+
 add_library(sigfn SHARED ${SIGFN_SOURCES})
 
 add_library(sigfn_a STATIC ${SIGFN_SOURCES})
 
-target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE})
+target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
 
-target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE})
+target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
+
+target_link_libraries(sigfn PUBLIC Threads::Threads)
+
+target_link_libraries(sigfn_a PUBLIC Threads::Threads)
 
 add_library(SigFn::SharedLibrary ALIAS sigfn)
 
