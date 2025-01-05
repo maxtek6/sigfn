@@ -29,12 +29,19 @@
 #define INVALID_SIGNUM -1
 #define INVALID_HANDLER nullptr
 
-#ifndef __FUNCTION_NAME__
-#ifdef WIN32 // WINDOWS
-#define __FUNCTION_NAME__ __FUNCTION__
-#else //*NIX
-#define __FUNCTION_NAME__ __func__
-#endif
+#ifndef _WIN32 // WINDOWS
+#include <unistd.h>
+template <class Period, class Rep>
+static void signal_from_child(int signum, const std::chrono::duration<Rep, Period> &duration)
+{
+    const pid_t pid = getpid();
+    if (fork() == 0)
+    {
+        std::this_thread::sleep_for(duration);
+        kill(pid, signum);
+        _exit(0);
+    }
+}
 #endif
 
 static void echo_signum(int signum, void *userdata);
@@ -63,6 +70,107 @@ MAXTEST_MAIN
     {
         MAXTEST_ASSERT(::sigfn_reset(INVALID_SIGNUM) == -1);
         MAXTEST_ASSERT(::sigfn_reset(SIGINT) == 0);
+    };
+
+    MAXTEST_TEST_CASE(sigfn_wait)
+    {
+#ifndef _WIN32 // WINDOWS
+        const int signums[1] = {SIGINT};
+        int signum(INVALID_SIGNUM);
+        int result;
+        // test empty sigset
+        result = ::sigfn_wait(NULL, 0, &signum);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        // test invalid signum
+        int zero(0);
+        result = ::sigfn_wait(&signum, 1, &zero);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(zero == 0);
+        // expect success
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait(&signums[0], 1, &signum);
+        MAXTEST_ASSERT(result == 0);
+        MAXTEST_ASSERT(signums[0] == signum);
+        // expect success but do not store signum
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait(&signums[0], 1, NULL);
+        MAXTEST_ASSERT(result == 0);
+#endif
+    };
+
+    MAXTEST_TEST_CASE(sigfn_wait_for)
+    {
+#ifndef _WIN32 // WINDOWS
+        const int signums[1] = {SIGINT};
+        int signum(INVALID_SIGNUM);
+        int result;
+        struct timeval timeout;
+        // test invalid timeval
+        result = ::sigfn_wait_for(&signums[0], 1, &signum, NULL);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 200000;
+        // test empty sigset
+        result = ::sigfn_wait_for(NULL, 0, &signum, &timeout);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        // expect success
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait_for(&signums[0], 1, &signum, &timeout);
+        MAXTEST_ASSERT(result == 0);
+        MAXTEST_ASSERT(signums[0] == signum);
+        // expect success but do not store signum
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait_for(&signums[0], 1, NULL, &timeout);
+        MAXTEST_ASSERT(result == 0);
+        // expect timeout
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 1;
+        signum = INVALID_SIGNUM;
+        result = ::sigfn_wait_for(&signums[0], 1, &signum, &timeout);
+        MAXTEST_ASSERT(result == 1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+#endif
+    };
+
+    MAXTEST_TEST_CASE(sigfn_wait_until)
+    {
+#ifndef _WIN32 // WINDOWS
+        const int signums[1] = {SIGINT};
+        int signum(INVALID_SIGNUM);
+        int result;
+        struct timeval deadline;
+        struct timeval now;
+        // test invalid timeval
+        result = ::sigfn_wait_until(&signums[0], 1, &signum, NULL);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        // expect success
+        gettimeofday(&now, NULL);
+        deadline.tv_sec = now.tv_sec + 1;
+        deadline.tv_usec = now.tv_usec;
+        // test empty sigset
+        result = ::sigfn_wait_until(NULL, 0, &signum, &deadline);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait_until(&signums[0], 1, &signum, &deadline);
+        MAXTEST_ASSERT(result == 0);
+        MAXTEST_ASSERT(signums[0] == signum);
+        // expect success but do not store signum
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait_until(&signums[0], 1, NULL, &deadline);
+        MAXTEST_ASSERT(result == 0);
+        deadline.tv_sec = now.tv_sec;
+        deadline.tv_usec = now.tv_usec;
+        signum = INVALID_SIGNUM;
+        // expect timeout
+        result = ::sigfn_wait_until(&signums[0], 1, &signum, &deadline);
+        MAXTEST_ASSERT(result == 1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+#endif
     };
 
     MAXTEST_TEST_CASE(sigfn_error)
@@ -184,6 +292,96 @@ MAXTEST_MAIN
             });
         try_catch_assert(INVALID_SIGNUM, true);
         try_catch_assert(SIGINT, false);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::wait)
+    {
+        const std::function<void(std::initializer_list<int>, bool)> try_catch_assert(
+            [](
+                std::initializer_list<int> signums,
+                bool expect_error)
+            {
+                bool has_error;
+
+                has_error = false;
+                try
+                {
+                    sigfn::wait(signums);
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+            });
+        try_catch_assert({}, true);
+        try_catch_assert({INVALID_SIGNUM}, true);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        try_catch_assert({SIGINT}, false);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::wait_for)
+    {
+        const std::function<void(int, bool, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error,
+                bool expect_timeout)
+            {
+                bool has_error;
+                std::optional<int> result;
+
+                has_error = false;
+                try
+                {
+                    result = sigfn::wait_for({signum}, std::chrono::milliseconds(200));
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+                if (!expect_error)
+                {
+                    MAXTEST_ASSERT(expect_timeout == !result.has_value());
+                }
+            });
+        try_catch_assert(INVALID_SIGNUM, true, false);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        try_catch_assert(SIGINT, false, false);
+        try_catch_assert(SIGINT, false, true);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::wait_until)
+    {
+        const std::function<void(int, bool, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error,
+                bool expect_timeout)
+            {
+                bool has_error;
+                std::optional<int> result;
+
+                has_error = false;
+                try
+                {
+                    result = sigfn::wait_until({signum}, std::chrono::system_clock::now() + std::chrono::milliseconds(200));
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+                if (!expect_error)
+                {
+                    MAXTEST_ASSERT(expect_timeout == !result.has_value());
+                }
+            });
+        try_catch_assert(INVALID_SIGNUM, true, false);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        try_catch_assert(SIGINT, false, false);
+        try_catch_assert(SIGINT, false, true);
     };
 }
 

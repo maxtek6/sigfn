@@ -52,7 +52,21 @@ void sigfn::internal::handle(int signum, sigfn_handler_func handler, void *userd
     sigfn::handle(signum, handler_function);
 }
 
-void sigfn::handle(int signum, const sigfn::handler_function& handler)
+std::chrono::system_clock::duration sigfn::internal::make_duration(const struct timeval *timeval)
+{
+    if (timeval == nullptr)
+    {
+        throw std::runtime_error(invalid_timeval);
+    }
+    return std::chrono::seconds(timeval->tv_sec) + std::chrono::microseconds(timeval->tv_usec);
+}
+
+std::chrono::system_clock::time_point sigfn::internal::make_time_point(const struct timeval *timeval)
+{
+    return std::chrono::system_clock::time_point(make_duration(timeval));
+}
+
+void sigfn::handle(int signum, const sigfn::handler_function &handler)
 {
     if (!handler)
     {
@@ -62,7 +76,7 @@ void sigfn::handle(int signum, const sigfn::handler_function& handler)
     internal::state::handler_map[signum] = handler;
 }
 
-void sigfn::handle(int signum, sigfn::handler_function&& handler)
+void sigfn::handle(int signum, sigfn::handler_function &&handler)
 {
     if (!handler)
     {
@@ -84,6 +98,35 @@ void sigfn::reset(int signum)
     static_cast<void>(sigfn::internal::state::handler_map.erase(signum));
 }
 
+int sigfn::wait(std::initializer_list<int> signums)
+{
+    int signum;
+    internal::wait(signums.begin(), signums.end(), signum);
+    return signum;
+}
+
+std::optional<int> sigfn::wait_for(std::initializer_list<int> signums, const std::chrono::system_clock::duration &timeout)
+{
+    std::optional<int> result;
+    int signum;
+    if (internal::wait_for(signums.begin(), signums.end(), signum, timeout))
+    {
+        result = signum;
+    }
+    return result;
+}
+
+std::optional<int> sigfn::wait_until(std::initializer_list<int> signums, const std::chrono::system_clock::time_point &deadline)
+{
+    std::optional<int> result;
+    int signum;
+    if (internal::wait_until(signums.begin(), signums.end(), signum, deadline))
+    {
+        result = signum;
+    }
+    return result;
+}
+
 int sigfn_handle(int signum, sigfn_handler_func handler, void *userdata)
 {
     return sigfn::internal::try_catch_return(sigfn::internal::handle, signum, handler, userdata);
@@ -97,6 +140,63 @@ int sigfn_ignore(int signum)
 int sigfn_reset(int signum)
 {
     return sigfn::internal::try_catch_return(sigfn::reset, signum);
+}
+
+int sigfn_wait(const int *signums, size_t count, int *received)
+{
+    std::vector<int> signums_vec(signums, signums + count);
+    return sigfn::internal::try_catch_return(
+        [&]()
+        {
+            int signum;
+            sigfn::internal::wait(signums_vec.begin(), signums_vec.end(), signum);
+            if (received != nullptr)
+            {
+                *received = signum;
+            }
+        });
+}
+
+int sigfn_wait_for(const int *signums, size_t count, int *received, const struct timeval *timeout)
+{
+    bool finished(false);
+    std::vector<int> signums_vec(signums, signums + count);
+    int result = sigfn::internal::try_catch_return(
+        [&]()
+        {
+            int signum;
+            finished = sigfn::internal::wait_for(signums_vec.begin(), signums_vec.end(), signum, sigfn::internal::make_duration(timeout));
+            if (finished && received != nullptr)
+            {
+                *received = signum;
+            }
+        });
+    if (result == 0 && !finished)
+    {
+        result = 1;
+    }
+    return result;
+}
+
+int sigfn_wait_until(const int *signums, size_t count, int *received, const struct timeval *deadline)
+{
+    bool finished(false);
+    std::vector<int> signums_vec(signums, signums + count);
+    int result = sigfn::internal::try_catch_return(
+        [&]()
+        {
+            int signum;
+            finished = sigfn::internal::wait_until(signums_vec.begin(), signums_vec.end(), signum, sigfn::internal::make_time_point(deadline));
+            if (finished && received != nullptr)
+            {
+                *received = signum;
+            }
+        });
+    if (result == 0 && !finished)
+    {
+        result = 1;
+    }
+    return result;
 }
 
 const char *sigfn_error()
