@@ -296,9 +296,9 @@ MAXTEST_MAIN
 
     MAXTEST_TEST_CASE(sigfn::wait)
     {
-        const std::function<void(int, bool)> try_catch_assert(
+        const std::function<void(std::initializer_list<int>, bool)> try_catch_assert(
             [](
-                int signum,
+                std::initializer_list<int> signums,
                 bool expect_error)
             {
                 bool has_error;
@@ -306,7 +306,7 @@ MAXTEST_MAIN
                 has_error = false;
                 try
                 {
-                    sigfn::wait({signum});
+                    sigfn::wait(signums);
                 }
                 catch (const std::exception &e)
                 {
@@ -314,9 +314,10 @@ MAXTEST_MAIN
                 }
                 MAXTEST_ASSERT(expect_error == has_error);
             });
-        try_catch_assert(INVALID_SIGNUM, true);
+        try_catch_assert({}, true);
+        try_catch_assert({INVALID_SIGNUM}, true);
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
-        try_catch_assert(SIGINT, false);
+        try_catch_assert({SIGINT}, false);
     };
 
     MAXTEST_TEST_CASE(sigfn::wait_for)
