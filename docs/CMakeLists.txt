@@ -6,8 +6,14 @@ set(doxyfile ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile)
 
 configure_file(${doxyfile_in} ${doxyfile} @ONLY)
 
+message(${PROJECT_SOURCE_DIR})
+
 add_custom_target(docs
     COMMAND ${DOXYGEN_EXECUTABLE} ${doxyfile}
     WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
     COMMENT "Generating API documentation with Doxygen"
     VERBATIM)
+
+add_custom_command(TARGET docs PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/../README.md ${CMAKE_CURRENT_SOURCE_DIR}/mainpage.md
+)
