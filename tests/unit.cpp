@@ -280,6 +280,95 @@ MAXTEST_MAIN
         try_catch_assert(INVALID_SIGNUM, true);
         try_catch_assert(SIGINT, false);
     };
+
+    MAXTEST_TEST_CASE(sigfn::wait)
+    {
+        const std::function<void(int, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error)
+            {
+                bool has_error;
+
+                has_error = false;
+                try
+                {
+                    sigfn::wait({signum});
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+            });
+        try_catch_assert(INVALID_SIGNUM, true);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        try_catch_assert(SIGINT, false);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::wait_for)
+    {
+        const std::function<void(int, bool, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error,
+                bool expect_timeout)
+            {
+                bool has_error;
+                std::optional<int> result;
+
+                has_error = false;
+                try
+                {
+                    result = sigfn::wait_for({signum}, std::chrono::milliseconds(200));
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+                if (!expect_error)
+                {
+                    MAXTEST_ASSERT(expect_timeout == !result.has_value());
+                }
+            });
+        try_catch_assert(INVALID_SIGNUM, true, false);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        try_catch_assert(SIGINT, false, false);
+        try_catch_assert(SIGINT, false, true);
+    };
+
+    MAXTEST_TEST_CASE(sigfn::wait_until)
+    {
+        const std::function<void(int, bool, bool)> try_catch_assert(
+            [](
+                int signum,
+                bool expect_error,
+                bool expect_timeout)
+            {
+                bool has_error;
+                std::optional<int> result;
+
+                has_error = false;
+                try
+                {
+                    result = sigfn::wait_until({signum}, std::chrono::system_clock::now() + std::chrono::milliseconds(200));
+                }
+                catch (const std::exception &e)
+                {
+                    has_error = (e.what() != nullptr);
+                }
+                MAXTEST_ASSERT(expect_error == has_error);
+                if (!expect_error)
+                {
+                    MAXTEST_ASSERT(expect_timeout == !result.has_value());
+                }
+            });
+        try_catch_assert(INVALID_SIGNUM, true, false);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        try_catch_assert(SIGINT, false, false);
+        try_catch_assert(SIGINT, false, true);
+    };
 }
 
 void echo_signum(int signum, void *userdata)

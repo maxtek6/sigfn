@@ -85,10 +85,30 @@ namespace sigfn
      */
     DLL_EXPORT void reset(int signum);
 
+    /**
+     * @brief wait for any signal in the list
+     *
+     * @param signums list of signals to wait for
+     * @return signal number
+     */
     DLL_EXPORT int wait(std::initializer_list<int> signums);
 
+    /**
+     * @brief wait for any signal in the list with a timeout
+     *
+     * @param signums list of signals to wait for
+     * @param timeout duration to wait
+     * @return signal number if received before timeout
+     */
     DLL_EXPORT std::optional<int> wait_for(std::initializer_list<int> signums, const std::chrono::system_clock::duration &timeout);
 
+    /**
+     * @brief wait for any signal in the list until a deadline
+     *
+     * @param signums list of signals to wait for
+     * @param deadline time point to wait until
+     * @return signal number if received before deadline
+     */
     DLL_EXPORT std::optional<int> wait_until(std::initializer_list<int> signums, const std::chrono::system_clock::time_point &deadline);
 }
 
