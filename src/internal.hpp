@@ -28,8 +28,6 @@
 
 #include <channels.hpp>
 
-#include <iostream>
-
 #ifdef _WIN32
 typedef void (*__sighandler_t)(int);
 #endif
@@ -41,6 +39,7 @@ namespace sigfn
         const std::string invalid_syscall = "sigfn: signal() failed";
         const std::string invalid_handler = "sigfn: invalid handler";
         const std::string empty_sigset = "sigfn: empty signum set";
+        const std::string invalid_timeval = "sigfn: invalid timeval";
 
         struct state
         {
@@ -58,20 +57,20 @@ namespace sigfn
         {
             if (std::distance(begin, end) == 0)
             {
-                std::cerr << "empty set" << std::endl;
                 throw std::runtime_error(empty_sigset);
             }
-            else
-            {
-                std::cerr << "not empty set" << std::endl;
-            }
-            for(IteratorType it = begin; it != end; ++it)
-            {
-                sigfn::handle(*it,[&](int signum)
-                {
-                    channel.write(signum);
+            std::for_each(
+                begin, 
+                end, 
+                [&](int signum)
+                { 
+                    sigfn::handle(
+                        signum, 
+                        [&](int value)
+                        { 
+                            channel.write(value); 
+                        }); 
                 });
-            }
         }
 
         template <class F, class... Args>
@@ -85,7 +84,6 @@ namespace sigfn
             }
             catch (const std::exception &e)
             {
-                std::cerr << "exception: " << e.what() << std::endl;
                 state::error_message = e.what();
                 result = -1;
             }
@@ -93,7 +91,7 @@ namespace sigfn
         }
 
         template <class IteratorType>
-        void wait(IteratorType begin, IteratorType end, int& signum)
+        void wait(IteratorType begin, IteratorType end, int &signum)
         {
             channels::buffered_channel<int> channel(std::max<std::size_t>(std::distance(begin, end), 1));
             handle_sigset(begin, end, channel);
@@ -101,7 +99,7 @@ namespace sigfn
         }
 
         template <class IteratorType>
-        bool wait_for(IteratorType begin, IteratorType end, int& signum, const std::chrono::system_clock::duration &timeout)
+        bool wait_for(IteratorType begin, IteratorType end, int &signum, const std::chrono::system_clock::duration &timeout)
         {
             channels::buffered_channel<int> channel(std::max<std::size_t>(std::distance(begin, end), 1));
             handle_sigset(begin, end, channel);
@@ -109,7 +107,7 @@ namespace sigfn
         }
 
         template <class IteratorType>
-        bool wait_until(IteratorType begin, IteratorType end, int& signum, const std::chrono::system_clock::time_point &deadline)
+        bool wait_until(IteratorType begin, IteratorType end, int &signum, const std::chrono::system_clock::time_point &deadline)
         {
             channels::buffered_channel<int> channel(std::max<std::size_t>(std::distance(begin, end), 1));
             handle_sigset(begin, end, channel);

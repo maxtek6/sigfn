@@ -36,7 +36,6 @@ void sigfn::internal::state::hook(int signum, __sighandler_t callback)
 
 void sigfn::internal::state::callback(int signum)
 {
-    std::cout << "sigfn::internal::handle: " << signum << std::endl;
     handler_map.at(signum)(signum);
 }
 
@@ -55,6 +54,10 @@ void sigfn::internal::handle(int signum, sigfn_handler_func handler, void *userd
 
 std::chrono::system_clock::duration sigfn::internal::make_duration(const struct timeval *timeval)
 {
+    if (timeval == nullptr)
+    {
+        throw std::runtime_error(invalid_timeval);
+    }
     return std::chrono::seconds(timeval->tv_sec) + std::chrono::microseconds(timeval->tv_usec);
 }
 
@@ -168,7 +171,6 @@ int sigfn_wait_for(const int *signums, size_t count, int *received, const struct
                 *received = signum;
             }
         });
-    std::cerr << "status: " << result << std::endl;
     if (result == 0 && !finished)
     {
         result = 1;

@@ -30,6 +30,7 @@
  */
 
 #include <csignal>
+#include <algorithm>
 #include <chrono>
 #include <functional>
 #include <initializer_list>
