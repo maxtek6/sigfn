@@ -21,7 +21,6 @@
  */
 
 #include "internal.hpp"
-#include <iostream>
 
 std::unordered_map<int, sigfn::handler_function> sigfn::internal::state::handler_map;
 std::string sigfn::internal::state::error_message;
@@ -142,11 +141,12 @@ int sigfn_reset(int signum)
 
 int sigfn_wait(const int *signums, size_t count, int *received)
 {
+    std::vector<int> signums_vec(signums, signums + count);
     return sigfn::internal::try_catch_return(
         [&]()
         {
             int signum;
-            sigfn::internal::wait(signums, signums + count, signum);
+            sigfn::internal::wait(signums_vec.begin(), signums_vec.end(), signum);
             if (received != nullptr)
             {
                 *received = signum;
@@ -157,17 +157,19 @@ int sigfn_wait(const int *signums, size_t count, int *received)
 int sigfn_wait_for(const int *signums, size_t count, int *received, const struct timeval *timeout)
 {
     bool finished(false);
+    std::vector<int> signums_vec(signums, signums + count);
     int result = sigfn::internal::try_catch_return(
         [&]()
         {
             int signum;
-            finished = sigfn::internal::wait_for(signums, signums + count, signum, sigfn::internal::make_duration(timeout));
+            finished = sigfn::internal::wait_for(signums_vec.begin(), signums_vec.end(), signum, sigfn::internal::make_duration(timeout));
             if (finished && received != nullptr)
             {
                 *received = signum;
             }
         });
-    if (result = 0 && !finished)
+    std::cerr << "status: " << result << std::endl;
+    if (result == 0 && !finished)
     {
         result = 1;
     }
@@ -177,21 +179,22 @@ int sigfn_wait_for(const int *signums, size_t count, int *received, const struct
 int sigfn_wait_until(const int *signums, size_t count, int *received, const struct timeval *deadline)
 {
     bool finished(false);
+    std::vector<int> signums_vec(signums, signums + count);
     int result = sigfn::internal::try_catch_return(
         [&]()
         {
             int signum;
-            finished = sigfn::internal::wait_until(signums, signums + count, signum, sigfn::internal::make_time_point(deadline));
+            finished = sigfn::internal::wait_until(signums_vec.begin(), signums_vec.end(), signum, sigfn::internal::make_time_point(deadline));
             if (finished && received != nullptr)
             {
                 *received = signum;
             }
         });
-    if (result = 0 && !finished)
+    if (result == 0 && !finished)
     {
         result = 1;
     }
-    return 0;
+    return result;
 }
 
 const char *sigfn_error()

@@ -58,14 +58,17 @@ namespace sigfn
         {
             if (std::distance(begin, end) == 0)
             {
+                std::cerr << "empty set" << std::endl;
                 throw std::runtime_error(empty_sigset);
+            }
+            else
+            {
+                std::cerr << "not empty set" << std::endl;
             }
             for(IteratorType it = begin; it != end; ++it)
             {
-                std::cout << "handling: " << *it << std::endl;
                 sigfn::handle(*it,[&](int signum)
                 {
-                    std::cout << "received: " << signum << std::endl;
                     channel.write(signum);
                 });
             }
@@ -82,6 +85,7 @@ namespace sigfn
             }
             catch (const std::exception &e)
             {
+                std::cerr << "exception: " << e.what() << std::endl;
                 state::error_message = e.what();
                 result = -1;
             }

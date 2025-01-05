@@ -78,9 +78,16 @@ MAXTEST_MAIN
         const int signums[1] = {SIGINT};
         int signum(INVALID_SIGNUM);
         int result;
+        // test empty sigset
         result = ::sigfn_wait(NULL, 0, &signum);
         MAXTEST_ASSERT(result == -1);
         MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        // test invalid signum
+        int zero(0);
+        result = ::sigfn_wait(&signum, 1, &zero);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(zero == 0);
+        // expect success
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
         result = ::sigfn_wait(&signums[0], 1, &signum);
         MAXTEST_ASSERT(result == 0);
@@ -98,6 +105,7 @@ MAXTEST_MAIN
         timeout.tv_sec = 0;
         timeout.tv_usec = 200000;
         result = ::sigfn_wait_for(NULL, 0, &signum, &timeout);
+        std::cerr << result << std::endl;
         MAXTEST_ASSERT(result == -1);
         MAXTEST_ASSERT(signum == INVALID_SIGNUM);
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
@@ -106,12 +114,40 @@ MAXTEST_MAIN
         MAXTEST_ASSERT(signums[0] == signum);
         timeout.tv_sec = 0;
         timeout.tv_usec = 1;
+        signum = INVALID_SIGNUM;
         result = ::sigfn_wait_for(&signums[0], 1, &signum, &timeout);
         MAXTEST_ASSERT(result == 1);
         MAXTEST_ASSERT(signum == INVALID_SIGNUM);
 #endif
     };
-    
+
+    MAXTEST_TEST_CASE(sigfn_wait_until)
+    {
+#ifndef _WIN32 // WINDOWS
+        const int signums[1] = {SIGINT};
+        int signum(INVALID_SIGNUM);
+        int result;
+        struct timeval deadline;
+        struct timeval now;
+        gettimeofday(&now, NULL);
+        deadline.tv_sec = now.tv_sec + 1;
+        deadline.tv_usec = now.tv_usec;
+        result = ::sigfn_wait_until(NULL, 0, &signum, &deadline);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait_until(&signums[0], 1, &signum, &deadline);
+        MAXTEST_ASSERT(result == 0);
+        MAXTEST_ASSERT(signums[0] == signum);
+        deadline.tv_sec = now.tv_sec;
+        deadline.tv_usec = now.tv_usec;
+        signum = INVALID_SIGNUM;
+        result = ::sigfn_wait_until(&signums[0], 1, &signum, &deadline);
+        MAXTEST_ASSERT(result == 1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+#endif
+    };
+
     MAXTEST_TEST_CASE(sigfn_error)
     {
         int flag;
