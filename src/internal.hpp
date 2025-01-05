@@ -55,22 +55,25 @@ namespace sigfn
         template <class IteratorType>
         void handle_sigset(IteratorType begin, IteratorType end, channels::buffered_channel<int> &channel)
         {
-            if (std::distance(begin, end) == 0)
+            if (std::distance(begin, end) > 0)
+            {
+                std::for_each(
+                    begin,
+                    end,
+                    [&](int signum)
+                    {
+                        sigfn::handle(
+                            signum,
+                            [&](int value)
+                            {
+                                channel.write(value);
+                            });
+                    });
+            }
+            else
             {
                 throw std::runtime_error(empty_sigset);
             }
-            std::for_each(
-                begin, 
-                end, 
-                [&](int signum)
-                { 
-                    sigfn::handle(
-                        signum, 
-                        [&](int value)
-                        { 
-                            channel.write(value); 
-                        }); 
-                });
         }
 
         template <class F, class... Args>
