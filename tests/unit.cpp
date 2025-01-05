@@ -153,7 +153,7 @@ MAXTEST_MAIN
         MAXTEST_ASSERT(signums[0] == signum);
         // expect success but do not store signum
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
-        result = ::sigfn_wait_until(&signums[0], 1, &signum, &deadline);
+        result = ::sigfn_wait_until(&signums[0], 1, NULL, &deadline);
         MAXTEST_ASSERT(result == 0);
         deadline.tv_sec = now.tv_sec;
         deadline.tv_usec = now.tv_usec;

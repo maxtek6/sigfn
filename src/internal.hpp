@@ -55,7 +55,8 @@ namespace sigfn
         template <class IteratorType>
         void handle_sigset(IteratorType begin, IteratorType end, channels::buffered_channel<int> &channel)
         {
-            if (std::distance(begin, end) > 0)
+            const std::size_t size = std::distance(begin, end);
+            if (size > 0)
             {
                 std::for_each(
                     begin,
