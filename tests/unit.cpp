@@ -29,12 +29,19 @@
 #define INVALID_SIGNUM -1
 #define INVALID_HANDLER nullptr
 
-#ifndef __FUNCTION_NAME__
-#ifdef WIN32 // WINDOWS
-#define __FUNCTION_NAME__ __FUNCTION__
-#else //*NIX
-#define __FUNCTION_NAME__ __func__
-#endif
+#ifndef _WIN32 // WINDOWS
+#include <unistd.h>
+template <class Period, class Rep>
+static void signal_from_child(int signum, const std::chrono::duration<Rep, Period> &duration)
+{
+    const pid_t pid = getpid();
+    if (fork() == 0)
+    {
+        std::this_thread::sleep_for(duration);
+        kill(pid, signum);
+        _exit(0);
+    }
+}
 #endif
 
 static void echo_signum(int signum, void *userdata);
@@ -67,21 +74,44 @@ MAXTEST_MAIN
 
     MAXTEST_TEST_CASE(sigfn_wait)
     {
+#ifndef _WIN32 // WINDOWS
         const int signums[1] = {SIGINT};
         int signum(INVALID_SIGNUM);
         int result;
-        std::thread signaler([&]()
-        {
-            std::cout << "sleeping" << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(2));
-            std::cout << "signaling" << std::endl;
-            std::raise(signums[0]);
-        });
+        result = ::sigfn_wait(NULL, 0, &signum);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
         result = ::sigfn_wait(&signums[0], 1, &signum);
-        MAXTEST_ASSERT(result == PASS);
+        MAXTEST_ASSERT(result == 0);
         MAXTEST_ASSERT(signums[0] == signum);
+#endif
     };
 
+    MAXTEST_TEST_CASE(sigfn_wait_for)
+    {
+#ifndef _WIN32 // WINDOWS
+        const int signums[1] = {SIGINT};
+        int signum(INVALID_SIGNUM);
+        int result;
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 200000;
+        result = ::sigfn_wait_for(NULL, 0, &signum, &timeout);
+        MAXTEST_ASSERT(result == -1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        result = ::sigfn_wait_for(&signums[0], 1, &signum, &timeout);
+        MAXTEST_ASSERT(result == 0);
+        MAXTEST_ASSERT(signums[0] == signum);
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 1;
+        result = ::sigfn_wait_for(&signums[0], 1, &signum, &timeout);
+        MAXTEST_ASSERT(result == 1);
+        MAXTEST_ASSERT(signum == INVALID_SIGNUM);
+#endif
+    };
+    
     MAXTEST_TEST_CASE(sigfn_error)
     {
         int flag;
