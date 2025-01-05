@@ -12,7 +12,8 @@ QUIET                  = NO
 PROJECT_NAME           = "SigFn"
 #PROJECT_NUMBER         = @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@
 INPUT                  = @PROJECT_SOURCE_DIR@/docs \
-                         @PROJECT_SOURCE_DIR@/include
+                         @PROJECT_SOURCE_DIR@/include \
+                         @PROJECT_SOURCE_DIR@
 
 FILE_PATTERNS          = *.hpp \
                          *h \
