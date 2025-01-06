@@ -33,6 +33,9 @@ target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_de
 
 target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
 
+set_property(TARGET sigfn PROPERTY CXX_STANDARD 17)
+set_property(TARGET sigfn_a PROPERTY CXX_STANDARD 17)
+
 target_link_libraries(sigfn PUBLIC Threads::Threads)
 
 target_link_libraries(sigfn_a PUBLIC Threads::Threads)
