@@ -29,6 +29,7 @@
  * @author John R. Patek Sr.
  */
 
+#include <stdint.h>
 #include <stdlib.h>
 #include <signal.h>
 

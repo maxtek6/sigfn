@@ -296,6 +296,7 @@ MAXTEST_MAIN
 
     MAXTEST_TEST_CASE(sigfn::wait)
     {
+#ifndef _WIN32 // WINDOWS
         const std::function<void(std::initializer_list<int>, bool)> try_catch_assert(
             [](
                 std::initializer_list<int> signums,
@@ -318,10 +319,12 @@ MAXTEST_MAIN
         try_catch_assert({INVALID_SIGNUM}, true);
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
         try_catch_assert({SIGINT}, false);
+#endif
     };
 
     MAXTEST_TEST_CASE(sigfn::wait_for)
     {
+#ifndef _WIN32 // WINDOWS
         const std::function<void(int, bool, bool)> try_catch_assert(
             [](
                 int signum,
@@ -350,10 +353,12 @@ MAXTEST_MAIN
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
         try_catch_assert(SIGINT, false, false);
         try_catch_assert(SIGINT, false, true);
+#endif
     };
 
     MAXTEST_TEST_CASE(sigfn::wait_until)
     {
+#ifndef _WIN32 // WINDOWS
         const std::function<void(int, bool, bool)> try_catch_assert(
             [](
                 int signum,
@@ -382,6 +387,7 @@ MAXTEST_MAIN
         signal_from_child(SIGINT, std::chrono::milliseconds(100));
         try_catch_assert(SIGINT, false, false);
         try_catch_assert(SIGINT, false, true);
+#endif
     };
 }
 

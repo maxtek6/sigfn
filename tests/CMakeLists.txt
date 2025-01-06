@@ -30,6 +30,8 @@ add_executable(
     unit.cpp
     ${SIGFN_SOURCES})
 
+set_property(TARGET unit PROPERTY CXX_STANDARD 17)
+
 target_include_directories(unit PRIVATE ${SIGFN_INCLUDE} ${CMAKE_CURRENT_SOURCE_DIR}/../src ${CMAKE_BINARY_DIR}/_deps/channels-src)
 
 if(SIGFN_COVER)
