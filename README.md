@@ -82,7 +82,7 @@ int main(int argc, const char **argv)
 Basic SigFn usage in C++. It is copied from `pause.cpp` in the 
 `examples` directory.
 
-```c++
+```cpp
 #include <sigfn.hpp>
 #include <iostream>
 
