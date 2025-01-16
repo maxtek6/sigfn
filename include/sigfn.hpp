@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Maxtek Consulting
+ * Copyright 2025 Maxtek Consulting
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
