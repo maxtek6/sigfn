@@ -26,20 +26,26 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Channels)
 
 add_library(sigfn SHARED ${SIGFN_SOURCES})
-
 add_library(sigfn_a STATIC ${SIGFN_SOURCES})
 
-target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
-
-target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
+target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE})
+target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE})
 
 set_property(TARGET sigfn PROPERTY CXX_STANDARD 17)
 set_property(TARGET sigfn_a PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(sigfn PUBLIC Threads::Threads)
+target_link_libraries(sigfn PUBLIC channels)
+target_link_libraries(sigfn_a PUBLIC channels)
 
-target_link_libraries(sigfn_a PUBLIC Threads::Threads)
+if(WIN32)
+    target_compile_options(sigfn PRIVATE /Ox /W4 /WX)
+    target_compile_options(sigfn_a PRIVATE /Ox /W4 /WX)
+    target_compile_definitions(sigfn PRIVATE WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(sigfn_a PRIVATE WIN32_LEAN_AND_MEAN)
+else()
+    target_compile_options(sigfn PRIVATE -O3 -Wall -Wextra -Wpedantic -march=native)
+    target_compile_options(sigfn_a PRIVATE -O3 -Wall -Wextra -Wpedantic -march=native)
+endif()
 
 add_library(SigFn::SharedLibrary ALIAS sigfn)
-
 add_library(SigFn::StaticLibrary ALIAS sigfn_a)

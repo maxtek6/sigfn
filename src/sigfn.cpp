@@ -94,13 +94,13 @@ void sigfn::ignore(int signum)
 
 void sigfn::reset(int signum)
 {
-    internal::state::hook(signum, SIG_IGN);
+    internal::state::hook(signum, SIG_DFL);
     static_cast<void>(sigfn::internal::state::handler_map.erase(signum));
 }
 
 int sigfn::wait(std::initializer_list<int> signums)
 {
-    int signum;
+    int signum(-1);
     internal::wait(signums.begin(), signums.end(), signum);
     return signum;
 }
@@ -108,7 +108,7 @@ int sigfn::wait(std::initializer_list<int> signums)
 std::optional<int> sigfn::wait_for(std::initializer_list<int> signums, const std::chrono::system_clock::duration &timeout)
 {
     std::optional<int> result;
-    int signum;
+    int signum(-1);
     if (internal::wait_for(signums.begin(), signums.end(), signum, timeout))
     {
         result = signum;
@@ -119,7 +119,7 @@ std::optional<int> sigfn::wait_for(std::initializer_list<int> signums, const std
 std::optional<int> sigfn::wait_until(std::initializer_list<int> signums, const std::chrono::system_clock::time_point &deadline)
 {
     std::optional<int> result;
-    int signum;
+    int signum(-1);
     if (internal::wait_until(signums.begin(), signums.end(), signum, deadline))
     {
         result = signum;
@@ -148,7 +148,7 @@ int sigfn_wait(const int *signums, size_t count, int *received)
     return sigfn::internal::try_catch_return(
         [&]()
         {
-            int signum;
+            int signum(-1);
             sigfn::internal::wait(signums_vec.begin(), signums_vec.end(), signum);
             if (received != nullptr)
             {
@@ -164,7 +164,7 @@ int sigfn_wait_for(const int *signums, size_t count, int *received, const struct
     int result = sigfn::internal::try_catch_return(
         [&]()
         {
-            int signum;
+            int signum(-1);
             finished = sigfn::internal::wait_for(signums_vec.begin(), signums_vec.end(), signum, sigfn::internal::make_duration(timeout));
             if (finished && received != nullptr)
             {
@@ -185,7 +185,7 @@ int sigfn_wait_until(const int *signums, size_t count, int *received, const stru
     int result = sigfn::internal::try_catch_return(
         [&]()
         {
-            int signum;
+            int signum(-1);
             finished = sigfn::internal::wait_until(signums_vec.begin(), signums_vec.end(), signum, sigfn::internal::make_time_point(deadline));
             if (finished && received != nullptr)
             {
