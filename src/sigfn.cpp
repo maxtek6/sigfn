@@ -94,7 +94,7 @@ void sigfn::ignore(int signum)
 
 void sigfn::reset(int signum)
 {
-    internal::state::hook(signum, SIG_IGN);
+    internal::state::hook(signum, SIG_DFL);
     static_cast<void>(sigfn::internal::state::handler_map.erase(signum));
 }
 
