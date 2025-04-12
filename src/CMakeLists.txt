@@ -28,14 +28,14 @@ FetchContent_MakeAvailable(Channels)
 add_library(sigfn SHARED ${SIGFN_SOURCES})
 add_library(sigfn_a STATIC ${SIGFN_SOURCES})
 
-target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
-target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE} ${CMAKE_BINARY_DIR}/_deps/channels-src)
+target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE})
+target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE})
 
 set_property(TARGET sigfn PROPERTY CXX_STANDARD 17)
 set_property(TARGET sigfn_a PROPERTY CXX_STANDARD 17)
 
-target_link_libraries(sigfn PUBLIC Threads::Threads)
-target_link_libraries(sigfn_a PUBLIC Threads::Threads)
+target_link_libraries(sigfn PUBLIC channels)
+target_link_libraries(sigfn_a PUBLIC channels)
 
 if(WIN32)
     target_compile_options(sigfn PRIVATE /Ox /W4 /WX)

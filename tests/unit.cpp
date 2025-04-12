@@ -88,12 +88,12 @@ MAXTEST_MAIN
         MAXTEST_ASSERT(result == -1);
         MAXTEST_ASSERT(zero == 0);
         // expect success
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         result = ::sigfn_wait(&signums[0], 1, &signum);
         MAXTEST_ASSERT(result == 0);
         MAXTEST_ASSERT(signums[0] == signum);
         // expect success but do not store signum
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         result = ::sigfn_wait(&signums[0], 1, NULL);
         MAXTEST_ASSERT(result == 0);
 #endif
@@ -117,12 +117,12 @@ MAXTEST_MAIN
         MAXTEST_ASSERT(result == -1);
         MAXTEST_ASSERT(signum == INVALID_SIGNUM);
         // expect success
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         result = ::sigfn_wait_for(&signums[0], 1, &signum, &timeout);
         MAXTEST_ASSERT(result == 0);
         MAXTEST_ASSERT(signums[0] == signum);
         // expect success but do not store signum
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         result = ::sigfn_wait_for(&signums[0], 1, NULL, &timeout);
         MAXTEST_ASSERT(result == 0);
         // expect timeout
@@ -155,12 +155,12 @@ MAXTEST_MAIN
         result = ::sigfn_wait_until(NULL, 0, &signum, &deadline);
         MAXTEST_ASSERT(result == -1);
         MAXTEST_ASSERT(signum == INVALID_SIGNUM);
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         result = ::sigfn_wait_until(&signums[0], 1, &signum, &deadline);
         MAXTEST_ASSERT(result == 0);
         MAXTEST_ASSERT(signums[0] == signum);
         // expect success but do not store signum
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         result = ::sigfn_wait_until(&signums[0], 1, NULL, &deadline);
         MAXTEST_ASSERT(result == 0);
         deadline.tv_sec = now.tv_sec;
@@ -317,7 +317,7 @@ MAXTEST_MAIN
             });
         try_catch_assert({}, true);
         try_catch_assert({INVALID_SIGNUM}, true);
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         try_catch_assert({SIGINT}, false);
 #endif
     };
@@ -350,7 +350,7 @@ MAXTEST_MAIN
                 }
             });
         try_catch_assert(INVALID_SIGNUM, true, false);
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         try_catch_assert(SIGINT, false, false);
         try_catch_assert(SIGINT, false, true);
 #endif
@@ -384,7 +384,7 @@ MAXTEST_MAIN
                 }
             });
         try_catch_assert(INVALID_SIGNUM, true, false);
-        signal_from_child(SIGINT, std::chrono::milliseconds(100));
+        signal_from_child(SIGINT, std::chrono::milliseconds(20));
         try_catch_assert(SIGINT, false, false);
         try_catch_assert(SIGINT, false, true);
 #endif
