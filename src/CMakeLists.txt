@@ -37,10 +37,11 @@ set_property(TARGET sigfn_a PROPERTY CXX_STANDARD 17)
 target_link_libraries(sigfn PUBLIC channels)
 target_link_libraries(sigfn_a PUBLIC channels)
 
+
 if(WIN32)
     target_compile_options(sigfn PRIVATE /Ox /W4 /WX)
     target_compile_options(sigfn_a PRIVATE /Ox /W4 /WX)
-    target_compile_definitions(sigfn PRIVATE WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(sigfn PRIVATE WIN32_LEAN_AND_MEAN) 
     target_compile_definitions(sigfn_a PRIVATE WIN32_LEAN_AND_MEAN)
 else()
     target_compile_options(sigfn PRIVATE -O3 -Wall -Wextra -Wpedantic -march=native)
