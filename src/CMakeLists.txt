@@ -39,8 +39,8 @@ target_link_libraries(sigfn_a PUBLIC channels)
 
 
 if(WIN32)
-    target_compile_options(sigfn PRIVATE /Ox /W4 /WX)
-    target_compile_options(sigfn_a PRIVATE /Ox /W4 /WX)
+    target_compile_options(sigfn PRIVATE $<$<CONFIG:Release>:/Ox /W4 /WX>)
+    target_compile_options(sigfn_a PRIVATE $<$<CONFIG:Release>:/Ox /W4 /WX>)
     target_compile_definitions(sigfn PRIVATE WIN32_LEAN_AND_MEAN) 
     target_compile_definitions(sigfn_a PRIVATE WIN32_LEAN_AND_MEAN)
 else()
