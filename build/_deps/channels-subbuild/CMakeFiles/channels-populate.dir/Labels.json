@@ -1,0 +1,46 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/CMakeFiles/channels-populate"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/CMakeFiles/channels-populate.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/CMakeFiles/channels-populate-complete.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-build.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-configure.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-download.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-install.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-mkdir.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-patch.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-test.rule"
+		},
+		{
+			"file" : "/home/runner/work/sigfn/sigfn/build/_deps/channels-subbuild/channels-populate-prefix/src/channels-populate-stamp/channels-populate-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"channels-populate"
+		],
+		"name" : "channels-populate"
+	}
+}
