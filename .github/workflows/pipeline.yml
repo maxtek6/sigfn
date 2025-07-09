@@ -75,7 +75,7 @@ jobs:
       with:
         source-directory: 'build/docs/html'
         destination-github-username: 'maxtek6'
-        destination-repository-name: 'maxtek6.github.io'
+        destination-repository-name: 'maxtek-github-react'
         user-email: johnpatek2@gmail.com
         target-branch: master
-        target-directory: docs/sigfn
+        target-directory: public/docs/sigfn
