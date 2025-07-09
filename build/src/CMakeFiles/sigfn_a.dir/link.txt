@@ -1,2 +1,0 @@
-/usr/bin/ar qc libsigfn_a.a CMakeFiles/sigfn_a.dir/sigfn.cpp.o
-/usr/bin/ranlib libsigfn_a.a

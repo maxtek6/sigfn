@@ -1,8 +1,0 @@
-/home/runner/work/sigfn/sigfn/build/CMakeFiles/edit_cache.dir
-/home/runner/work/sigfn/sigfn/build/CMakeFiles/rebuild_cache.dir
-/home/runner/work/sigfn/sigfn/build/src/CMakeFiles/sigfn.dir
-/home/runner/work/sigfn/sigfn/build/src/CMakeFiles/sigfn_a.dir
-/home/runner/work/sigfn/sigfn/build/src/CMakeFiles/edit_cache.dir
-/home/runner/work/sigfn/sigfn/build/src/CMakeFiles/rebuild_cache.dir
-/home/runner/work/sigfn/sigfn/build/_deps/channels-build/CMakeFiles/edit_cache.dir
-/home/runner/work/sigfn/sigfn/build/_deps/channels-build/CMakeFiles/rebuild_cache.dir
