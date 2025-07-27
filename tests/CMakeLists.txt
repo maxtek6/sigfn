@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+include(FetchContent)
+
 FetchContent_Declare(
     Maxtest
     GIT_REPOSITORY https://github.com/maxtek6/maxtest.git

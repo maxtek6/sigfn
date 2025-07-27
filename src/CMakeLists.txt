@@ -43,3 +43,11 @@ endif()
 
 add_library(SigFn::SharedLibrary ALIAS sigfn)
 add_library(SigFn::StaticLibrary ALIAS sigfn_a)
+
+install(
+    TARGETS sigfn sigfn_a
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    COMPONENT runtime
+)
