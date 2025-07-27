@@ -26,7 +26,7 @@
 #include <sigfn.h>
 #include <sigfn.hpp>
 
-#include <channels.hpp>
+#include <future>
 
 #ifdef _WIN32
 typedef void (*__sighandler_t)(int);
@@ -53,7 +53,7 @@ namespace sigfn
         void handle(int signum, sigfn_handler_func handler, void *userdata);
 
         template <class IteratorType>
-        void handle_sigset(IteratorType begin, IteratorType end, channels::buffered_channel<int> &channel)
+        void handle_sigset(IteratorType begin, IteratorType end, std::promise<int> &promise)
         {
             const std::size_t size = std::distance(begin, end);
             if (size > 0)
@@ -67,7 +67,7 @@ namespace sigfn
                             signum,
                             [&](int value)
                             {
-                                channel.write(value);
+                                promise.set_value(value);
                             });
                     });
             }
@@ -97,25 +97,39 @@ namespace sigfn
         template <class IteratorType>
         void wait(IteratorType begin, IteratorType end, int &signum)
         {
-            channels::buffered_channel<int> channel(std::max<std::size_t>(std::distance(begin, end), 1));
-            handle_sigset(begin, end, channel);
-            channel.read(signum);
+            std::promise<int> promise;
+            handle_sigset(begin, end, promise);
+            signum = promise.get_future().get();
         }
 
         template <class IteratorType>
         bool wait_for(IteratorType begin, IteratorType end, int &signum, const std::chrono::system_clock::duration &timeout)
         {
-            channels::buffered_channel<int> channel(std::max<std::size_t>(std::distance(begin, end), 1));
-            handle_sigset(begin, end, channel);
-            return channel.read_for(signum, timeout) == channels::read_status::success;
+            bool ready(false);
+            std::promise<int> promise;
+            std::future<int> future = promise.get_future();
+            handle_sigset(begin, end, promise);
+            ready = (future.wait_for(timeout) == std::future_status::ready);
+            if (ready)
+            {
+                signum = future.get();
+            }
+            return ready;
         }
 
         template <class IteratorType>
         bool wait_until(IteratorType begin, IteratorType end, int &signum, const std::chrono::system_clock::time_point &deadline)
         {
-            channels::buffered_channel<int> channel(std::max<std::size_t>(std::distance(begin, end), 1));
-            handle_sigset(begin, end, channel);
-            return channel.read_until(signum, deadline) == channels::read_status::success;
+            bool ready(false);
+            std::promise<int> promise;
+            std::future<int> future = promise.get_future();
+            handle_sigset(begin, end, promise);
+            ready = (future.wait_until(deadline) == std::future_status::ready);
+            if (ready)
+            {
+                signum = future.get();
+            }
+            return ready;
         }
 
         std::chrono::system_clock::duration make_duration(const struct timeval *timeval);
