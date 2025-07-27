@@ -107,11 +107,12 @@ namespace sigfn
         {
             bool ready(false);
             std::promise<int> promise;
+            std::future<int> future = promise.get_future();
             handle_sigset(begin, end, promise);
-            ready = (promise.get_future().wait_for(timeout) == std::future_status::ready);
+            ready = (future.wait_for(timeout) == std::future_status::ready);
             if (ready)
             {
-                signum = promise.get_future().get();
+                signum = future.get();
             }
             return ready;
         }
@@ -121,11 +122,12 @@ namespace sigfn
         {
             bool ready(false);
             std::promise<int> promise;
+            std::future<int> future = promise.get_future();
             handle_sigset(begin, end, promise);
-            ready = (promise.get_future().wait_until(deadline) == std::future_status::ready);
+            ready = (future.wait_until(deadline) == std::future_status::ready);
             if (ready)
             {
-                signum = promise.get_future().get();
+                signum = future.get();
             }
             return ready;
         }
