@@ -21,8 +21,15 @@
 add_library(sigfn SHARED ${SIGFN_SOURCES})
 add_library(sigfn_a STATIC ${SIGFN_SOURCES})
 
-target_include_directories(sigfn PUBLIC ${SIGFN_INCLUDE})
-target_include_directories(sigfn_a PUBLIC ${SIGFN_INCLUDE})
+target_include_directories(sigfn 
+    PUBLIC 
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
+
+target_include_directories(sigfn_a 
+    PUBLIC 
+    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:include>)
 
 set_property(TARGET sigfn PROPERTY CXX_STANDARD 17)
 set_property(TARGET sigfn_a PROPERTY CXX_STANDARD 17)
@@ -41,14 +48,35 @@ else()
     target_compile_options(sigfn_a PRIVATE -O3 -Wall -Wextra -Wpedantic -march=native)
 endif()
 
+include(CMakePackageConfigHelpers)
+
+configure_package_config_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/../sigfn-config.cmake.in
+    ${PROJECT_BINARY_DIR}/sigfn-config.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sigfn)
+
+install(DIRECTORY ${SIGFN_INCLUDE}/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        COMPONENT core)
+
 install(
     TARGETS sigfn sigfn_a
+    EXPORT sigfn-targets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT runtime
+    COMPONENT core
 )
 
-export(TARGETS sigfn sigfn_a NAMESPACE sigfn
+install(EXPORT sigfn-targets
+    NAMESPACE sigfn::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sigfn
+)
+
+install(FILES ${PROJECT_BINARY_DIR}/sigfn-config.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/sigfn
+)
+
+export(TARGETS sigfn sigfn_a NAMESPACE sigfn::
     FILE ${PROJECT_BINARY_DIR}/sigfn-targets.cmake
 )
