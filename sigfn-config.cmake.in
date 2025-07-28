@@ -1,1 +1,5 @@
 @PACKAGE_INIT@
+
+if (NOT TARGET sigfn::sigfn)
+    include(${CMAKE_CURRENT_LIST_DIR}/sigfn-targets.cmake)
+endif ()
