@@ -48,9 +48,3 @@ endif()
 if(SIGFN_DOCS)
     add_subdirectory(docs)
 endif()
-
-install(
-    DIRECTORY ${SIGFN_INCLUDE}/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT dev
-)
