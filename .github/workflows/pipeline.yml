@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Install gcovr
       run: sudo apt-get install -y gcovr
@@ -45,7 +45,7 @@ jobs:
       run: make cover
 
     - name: Upload Coverage Report
-      uses: codecov/codecov-action@v5.4.3
+      uses: codecov/codecov-action@v5.5.0
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         slug: maxtek6/sigfn
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Install Doxygen
       uses: ssciwr/doxygen-install@v1
