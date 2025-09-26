@@ -69,7 +69,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --target docs
       
     - name: Publish
-      uses: cpina/github-action-push-to-another-repository@v1.7.2
+      uses: cpina/github-action-push-to-another-repository@v1.7.3
       env:
         SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
       with:
